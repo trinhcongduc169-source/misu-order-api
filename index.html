@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>MISU Order App</title>
+  <style>
+    :root {
+      --walnut: #6f4e37;
+      --walnut-dark: #3f2d23;
+      --beige: #e8dcc7;
+      --cream: #fffaf2;
+      --paper: #ffffff;
+      --ink: #2f2924;
+      --muted: #7c7067;
+      --line: #ded2c0;
+      --ok: #31705b;
+      --warn: #a36b21;
+      --danger: #9d3b30;
+      --shadow: 0 18px 45px rgba(63, 45, 35, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: manipulation;
+    }
+
+    body {
+      margin: 0;
+      width: 100%;
+      min-width: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        linear-gradient(135deg, rgba(232, 220, 199, 0.58), rgba(255, 250, 242, 0.96)),
+        var(--cream);
+      color: var(--ink);
+      font-family: Arial, "Helvetica Neue", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    .page {
+      width: min(1120px, 100%);
+      max-width: 100vw;
+      margin: 0 auto;
+      padding: 28px 18px 44px;
+      overflow-x: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+      padding: 0 2px;
+    }
+
+    .brand {
+      margin: 0;
+      color: var(--walnut-dark);
+      font-size: clamp(28px, 5vw, 46px);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .tagline {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel,
+    .invoice {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(222, 210, 192, 0.9);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .invoice {
+      position: sticky;
+      top: 18px;
+      padding: 18px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 18px;
+      color: var(--walnut-dark);
+    }
+
+    .customer-grid,
+    .shelf-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .customer-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .customer-grid .wide {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--walnut-dark);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 48px;
+      max-width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 17px !important;
+      font-weight: 600;
+      line-height: 1.35;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      -webkit-appearance: none;
+      appearance: none;
+      transform: translateZ(0);
+    }
+
+    select {
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--walnut) 50%),
+        linear-gradient(135deg, var(--walnut) 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) 50%,
+        calc(100% - 13px) 50%;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+      padding-right: 34px;
+    }
+
+    textarea {
+      min-height: 78px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--walnut);
+      box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.16);
+      background: #fffdf8;
+    }
+
+    .shelves {
+      display: grid;
+      gap: 12px;
+    }
+
+    .shelf-row {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 250, 242, 0.76);
+      padding: 14px;
+    }
+
+    .shelf-row-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .shelf-name {
+      margin: 0;
+      color: var(--walnut-dark);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .shelf-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .shelf-grid .type {
+      grid-column: span 2;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 11px 16px;
+      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+      touch-action: manipulation;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.58;
+      transform: none;
+    }
+
+    .btn-primary {
+      flex: 1 1 180px;
+      background: var(--walnut);
+      color: var(--cream);
+      box-shadow: 0 12px 24px rgba(111, 78, 55, 0.22);
+    }
+
+    .btn-secondary {
+      background: #f4eadb;
+      color: var(--walnut-dark);
+      border: 1px solid var(--line);
+    }
+
+    .btn-danger {
+      min-height: 36px;
+      padding: 7px 10px;
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid rgba(157, 59, 48, 0.34);
+      font-size: 13px;
+    }
+
+    .invoice-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+
+    .invoice-title {
+      margin: 0;
+      color: var(--walnut-dark);
+      font-size: 18px;
+    }
+
+    .invoice-count {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .invoice-lines {
+      display: grid;
+      gap: 10px;
+      min-height: 64px;
+    }
+
+    .invoice-line {
+      display: grid;
+      gap: 5px;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .line-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .line-meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .line-note {
+      color: var(--warn);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .invoice-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 2px solid var(--walnut);
+      color: var(--walnut-dark);
+      font-weight: 700;
+    }
+
+    .total-number {
+      font-size: 24px;
+    }
+
+    .message {
+      display: none;
+      margin-top: 14px;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: 700;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background: rgba(49, 112, 91, 0.1);
+      color: var(--ok);
+      border: 1px solid rgba(49, 112, 91, 0.22);
+    }
+
+    .message.error {
+      background: rgba(157, 59, 48, 0.1);
+      color: var(--danger);
+      border: 1px solid rgba(157, 59, 48, 0.22);
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 12px 0;
+    }
+
+    .mobile-view .topbar {
+      display: block;
+    }
+
+    .mobile-view .layout {
+      grid-template-columns: 1fr;
+    }
+
+    .mobile-view .invoice {
+      position: static;
+    }
+
+    .mobile-view .customer-grid,
+    .mobile-view .shelf-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .mobile-view .shelf-grid .type {
+      grid-column: auto;
+    }
+
+    .mobile-view .shelf-row-head {
+      align-items: flex-start;
+    }
+
+    .mobile-view .line-main,
+    .mobile-view .invoice-total {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .mobile-view .page {
+      width: 100vw;
+      padding: 14px 10px 28px;
+    }
+
+    .mobile-view .brand {
+      font-size: 30px;
+    }
+
+    .mobile-view .tagline {
+      font-size: 14px;
+    }
+
+    .mobile-view .panel,
+    .mobile-view .invoice {
+      padding: 12px;
+      box-shadow: 0 10px 28px rgba(63, 45, 35, 0.1);
+    }
+
+    .mobile-view .section-title,
+    .mobile-view .invoice-title {
+      font-size: 20px;
+    }
+
+    .mobile-view label {
+      gap: 5px;
+      font-size: 15px;
+    }
+
+    .mobile-view input,
+    .mobile-view select,
+    .mobile-view textarea {
+      font-size: 17px !important;
+    }
+
+    .mobile-view .shelf-row {
+      padding: 12px;
+    }
+
+    .mobile-view .actions {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+
+    .mobile-view .btn-primary,
+    .mobile-view .btn-secondary {
+      width: 100%;
+    }
+
+    @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+      .topbar {
+        display: block;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .invoice {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px), (hover: none) and (pointer: coarse) {
+      .page {
+        padding: 20px 12px 32px;
+      }
+
+      .panel,
+      .invoice {
+        padding: 14px;
+      }
+
+      .customer-grid,
+      .shelf-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .shelf-grid .type {
+        grid-column: auto;
+      }
+
+      .shelf-row-head {
+        align-items: flex-start;
+      }
+
+      .btn-danger {
+        white-space: nowrap;
+      }
+
+      .line-main,
+      .invoice-total {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div>
+        <h1 class="brand">MISU Order App</h1>
+        <p class="tagline">Đặt kệ module theo kích thước và màu sắc mong muốn.</p>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="panel" aria-label="Thông tin đặt hàng">
+        <h2 class="section-title">Thông tin khách hàng</h2>
+
+        <div class="customer-grid">
+          <label>
+            Họ tên
+            <input id="customerName" type="text" autocomplete="name" placeholder="Nguyễn Minh Anh">
+          </label>
+
+          <label>
+            Số điện thoại
+            <input id="phone" type="tel" autocomplete="tel" placeholder="09xxxxxxxx">
+          </label>
+
+          <label class="wide">
+            Địa chỉ giao hàng
+            <textarea id="address" autocomplete="street-address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"></textarea>
+          </label>
+        </div>
+
+        <h2 class="section-title">Danh sách kệ</h2>
+        <div id="shelves" class="shelves"></div>
+
+        <div class="actions">
+          <button class="btn-secondary" type="button" onclick="addShelf()">+ Thêm kệ</button>
+          <button id="submitButton" class="btn-primary" type="button" onclick="submitOrder()">Gửi đơn</button>
+        </div>
+
+        <div id="formMessage" class="message" role="status"></div>
+      </section>
+
+      <aside class="invoice" aria-label="Hóa đơn tạm tính">
+        <div class="invoice-head">
+          <h2 class="invoice-title">Hóa đơn tạm</h2>
+          <span id="invoiceCount" class="invoice-count">0 dòng</span>
+        </div>
+
+        <div id="invoiceLines" class="invoice-lines"></div>
+
+        <div class="invoice-total">
+          <span>Tổng tạm tính</span>
+          <span id="invoiceTotal" class="total-number">0đ</span>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const OPTIONS = {
+      shelfTypes: ['Hệ kệ đứng độc lập', 'Hệ kệ lắp ghép'],
+      heights: [50, 70, 90, 110, 130, 150, 170, 190, 210],
+      widths: [40, 50, 60, 70, 80, 90, 100],
+      depths: [30, 35, 40, 45, 50],
+      colors: ['Walnut / Óc chó', 'Gỗ vàng'],
+      quantities: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    };
+
+    let shelves = [];
+    let priceTable = [];
+    const LOCAL_API_BASE_URL = 'http://localhost:3002';
+    const RENDER_API_BASE_URL = 'https://YOUR_RENDER_URL.onrender.com';
+    const isLocalFrontend = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
+    const renderOrigin = window.location.hostname.endsWith('.onrender.com')
+      ? window.location.origin
+      : RENDER_API_BASE_URL;
+    const API_BASE_URL = isLocalFrontend
+      ? LOCAL_API_BASE_URL
+      : (window.MISU_API_BASE_URL || renderOrigin);
+    const PRICE_API_URL = `${API_BASE_URL}/prices`;
+    const ORDER_API_URL = `${API_BASE_URL}/orders`;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateMobileView();
+      addShelf();
+      loadPriceTable();
+    });
+
+    window.addEventListener('resize', updateMobileView);
+
+    function updateMobileView() {
+      const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+      const screenWidth = Math.min(window.screen.width || viewportWidth, window.screen.height || viewportWidth);
+      const isTouchPhone = navigator.maxTouchPoints > 0 && screenWidth <= 768;
+      document.body.classList.toggle('mobile-view', viewportWidth <= 1024 || isTouchPhone);
+    }
+
+    function loadPriceTable() {
+      // Lấy bảng giá từ Google Sheet để hóa đơn tạm cập nhật ngay khi khách chọn kệ.
+      fetch(PRICE_API_URL)
+        .then(response => response.json())
+        .then((data) => {
+          priceTable = Array.isArray(data.priceTable) ? data.priceTable : [];
+          renderInvoice();
+        })
+        .catch((error) => {
+          priceTable = buildPreviewPriceTable();
+          showMessage(error.message || 'Chưa tải được bảng giá.', 'error');
+          renderInvoice();
+        });
+    }
+
+    function addShelf() {
+      shelves.push({
+        shelfType: OPTIONS.shelfTypes[0],
+        height: OPTIONS.heights[0],
+        width: OPTIONS.widths[0],
+        depth: OPTIONS.depths[0],
+        color: OPTIONS.colors[0],
+        quantity: 1,
+      });
+
+      renderShelves();
+      renderInvoice();
+    }
+
+    function removeShelf(index) {
+      if (shelves.length === 1) {
+        showMessage('Đơn hàng cần ít nhất một dòng kệ.', 'error');
+        return;
+      }
+
+      shelves.splice(index, 1);
+      renderShelves();
+      renderInvoice();
+    }
+
+    function updateShelf(index, key, value) {
+      shelves[index][key] = ['height', 'width', 'depth', 'quantity'].includes(key) ? Number(value) : value;
+      renderInvoice();
+    }
+
+    function renderShelves() {
+      const shelvesElement = document.getElementById('shelves');
+
+      shelvesElement.innerHTML = shelves.map((shelf, index) => `
+        <article class="shelf-row">
+          <div class="shelf-row-head">
+            <p class="shelf-name">Kệ ${index + 1}</p>
+            <button class="btn-danger" type="button" onclick="removeShelf(${index})">Xóa dòng kệ</button>
+          </div>
+
+          <div class="shelf-grid">
+            ${selectField('Kiểu kệ', index, 'shelfType', OPTIONS.shelfTypes, shelf.shelfType, 'type')}
+            ${selectField('Chiều cao', index, 'height', OPTIONS.heights, shelf.height)}
+            ${selectField('Chiều rộng', index, 'width', OPTIONS.widths, shelf.width)}
+            ${selectField('Độ sâu', index, 'depth', OPTIONS.depths, shelf.depth)}
+            ${selectField('Màu sắc', index, 'color', OPTIONS.colors, shelf.color)}
+            ${selectField('Số lượng', index, 'quantity', OPTIONS.quantities, shelf.quantity)}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function selectField(label, index, key, options, value, extraClass = '') {
+      return `
+        <label class="${extraClass}">
+          ${label}
+          <select onchange="updateShelf(${index}, '${key}', this.value)">
+            ${options.map(option => `
+              <option value="${option}" ${String(option) === String(value) ? 'selected' : ''}>${formatOption(option, key)}</option>
+            `).join('')}
+          </select>
+        </label>
+      `;
+    }
+
+    function formatOption(option, key) {
+      if (key === 'height' || key === 'width' || key === 'depth') {
+        return `${option} cm`;
+      }
+
+      return option;
+    }
+
+    function renderInvoice() {
+      // Nếu thiếu giá trong PRICE_TABLE, dòng đó vẫn được giữ lại và đánh dấu chờ xác nhận.
+      const linesElement = document.getElementById('invoiceLines');
+      const pricedShelves = shelves.map(getPricedShelf);
+      const total = pricedShelves.reduce((sum, shelf) => sum + shelf.lineTotal, 0);
+
+      document.getElementById('invoiceCount').textContent = `${shelves.length} dòng`;
+      document.getElementById('invoiceTotal').textContent = formatCurrency(total);
+
+      if (!pricedShelves.length) {
+        linesElement.innerHTML = '<div class="empty">Chưa có dòng kệ nào.</div>';
+        return;
+      }
+
+      linesElement.innerHTML = pricedShelves.map((shelf, index) => `
+        <div class="invoice-line">
+          <div class="line-main">
+            <span>Kệ ${index + 1} · ${shelf.quantity} bộ</span>
+            <span>${shelf.needsConfirmation ? 'Chờ xác nhận' : formatCurrency(shelf.lineTotal)}</span>
+          </div>
+          <div class="line-meta">
+            ${shelf.shelfType}, ${shelf.height}x${shelf.width}x${shelf.depth} cm, ${shelf.color}
+          </div>
+          ${shelf.needsConfirmation ? '<div class="line-note">Cần MISU xác nhận giá</div>' : `<div class="line-meta">${formatCurrency(shelf.unitPrice)} / bộ</div>`}
+        </div>
+      `).join('');
+    }
+
+    function getPricedShelf(shelf) {
+      const priceInfo = priceTable.find(item =>
+        Number(item.height) === Number(shelf.height) &&
+        Number(item.width) === Number(shelf.width) &&
+        Number(item.depth) === Number(shelf.depth) &&
+        item.color === shelf.color
+      );
+      const unitPrice = priceInfo ? Number(priceInfo.price) || 0 : 0;
+      const quantity = Number(shelf.quantity) || 1;
+
+      return {
+        ...shelf,
+        sku: priceInfo ? priceInfo.sku : '',
+        unitPrice,
+        lineTotal: unitPrice * quantity,
+        needsConfirmation: !priceInfo,
+      };
+    }
+
+    function buildPreviewPriceTable() {
+      const rows = [];
+
+      OPTIONS.heights.forEach(height => {
+        OPTIONS.widths.forEach(width => {
+          OPTIONS.depths.forEach(depth => {
+            OPTIONS.colors.forEach(color => {
+              const base = 390000;
+              const sizeFactor = (height * 1800) + (width * 2400) + (depth * 1800);
+              const colorFactor = color === 'Walnut / Óc chó' ? 50000 : 0;
+              rows.push({
+                sku: `PREVIEW-${height}-${width}-${depth}`,
+                height,
+                width,
+                depth,
+                color,
+                price: Math.round((base + sizeFactor + colorFactor) / 10000) * 10000,
+                status: 'Đang bán',
+              });
+            });
+          });
+        });
+      });
+
+      return rows;
+    }
+
+    function submitOrder() {
+      // Gửi toàn bộ thông tin khách hàng và danh sách kệ về Apps Script để lưu đơn.
+      const orderData = {
+        customerName: document.getElementById('customerName').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        address: document.getElementById('address').value.trim(),
+        items: shelves,
+      };
+
+      if (!orderData.customerName || !orderData.phone || !orderData.address) {
+        showMessage('Vui lòng nhập đủ họ tên, số điện thoại và địa chỉ giao hàng.', 'error');
+        return;
+      }
+
+      setSubmitting(true);
+      showMessage('', '');
+
+      fetch(ORDER_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      })
+        .then(response => response.json())
+        .then((result) => {
+          if (!result.success) {
+            throw new Error(result.message || 'Chưa gửi được đơn. Vui lòng thử lại.');
+          }
+
+          setSubmitting(false);
+          showMessage(`Cảm ơn bạn. MISU đã nhận đơn ${result.orderCode}.`, 'success');
+          resetForm();
+        })
+        .catch((error) => {
+          setSubmitting(false);
+          showMessage(error.message || 'Chưa gửi được đơn. Vui lòng thử lại.', 'error');
+        });
+    }
+
+    function resetForm() {
+      document.getElementById('customerName').value = '';
+      document.getElementById('phone').value = '';
+      document.getElementById('address').value = '';
+      shelves = [];
+      addShelf();
+    }
+
+    function setSubmitting(isSubmitting) {
+      const button = document.getElementById('submitButton');
+      button.disabled = isSubmitting;
+      button.textContent = isSubmitting ? 'Đang gửi...' : 'Gửi đơn';
+    }
+
+    function showMessage(text, type) {
+      const messageElement = document.getElementById('formMessage');
+      messageElement.textContent = text;
+      messageElement.className = text ? `message show ${type}` : 'message';
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        maximumFractionDigits: 0,
+      }).format(value || 0);
+    }
+  </script>
+</body>
+</html>

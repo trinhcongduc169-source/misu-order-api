@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: misu-order-system
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GOOGLE_SCRIPT_WEB_APP_URL
+        sync: false
+      - key: CORS_ORIGIN
+        value: "*"
