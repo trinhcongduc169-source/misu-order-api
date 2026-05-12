@@ -1,5 +1,6 @@
 const PRICE_TABLE_SHEET = 'PRICE_TABLE';
 const WEB_ORDERS_SHEET = 'WEB_ORDERS';
+const COUNTERS_SHEET = 'COUNTERS';
 
 const PRICE_HEADERS = [
   'SKU',
@@ -22,6 +23,15 @@ const ORDER_HEADERS = [
   'Trạng thái',
   'Ghi chú',
 ];
+
+const COUNTER_HEADERS = [
+  'Khóa',
+  'Ngày đơn',
+  'Số thứ tự cuối',
+  'Cập nhật lúc',
+];
+
+const ORDER_COUNTER_KEY = 'ORDER_CODE';
 
 const HEIGHTS = [50, 70, 90, 110, 130, 150, 170, 190, 210];
 const WIDTHS = [40, 50, 60, 70, 80, 90, 100];
@@ -106,43 +116,58 @@ function getPriceTable() {
 }
 
 function submitOrder(orderData) {
-  const cleanOrder = sanitizeOrderData_(orderData);
-  const priceMap = buildPriceMap_(getPriceTable());
-  const pricedItems = cleanOrder.items.map(item => enrichItemWithPrice_(item, priceMap));
-  const total = pricedItems.reduce((sum, item) => sum + item.lineTotal, 0);
-  const orderCode = cleanOrder.orderCode || createOrderCode_();
-  const hasUnconfirmedPrice = pricedItems.some(item => item.needsConfirmation);
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
 
-  const sheet = getOrCreateSheet_(WEB_ORDERS_SHEET, ORDER_HEADERS);
-  sheet.appendRow([
-    orderCode,
-    new Date(),
-    cleanOrder.customerName,
-    cleanOrder.phone,
-    cleanOrder.address,
-    formatOrderDetails_(pricedItems),
-    total,
-    hasUnconfirmedPrice ? 'Chờ xác nhận giá' : 'Đơn mới',
-    cleanOrder.note,
-  ]);
+  try {
+    const cleanOrder = sanitizeOrderData_(orderData);
+    const priceMap = buildPriceMap_(getPriceTable());
+    const pricedItems = cleanOrder.items.map(item => enrichItemWithPrice_(item, priceMap));
+    const total = pricedItems.reduce((sum, item) => sum + item.lineTotal, 0);
+    const orderCodeInfo = generateOrderCode_();
+    const hasUnconfirmedPrice = pricedItems.some(item => item.needsConfirmation);
 
-  return {
-    success: true,
-    orderCode,
-    total,
-    hasUnconfirmedPrice,
-    message: hasUnconfirmedPrice
-      ? 'MISU đã nhận đơn. Một số dòng kệ cần xác nhận giá.'
-      : 'MISU đã nhận đơn của bạn.',
-  };
+    const sheet = getOrCreateSheet_(WEB_ORDERS_SHEET, ORDER_HEADERS);
+    sheet.appendRow([
+      orderCodeInfo.orderCode,
+      new Date(),
+      cleanOrder.customerName,
+      cleanOrder.phone,
+      cleanOrder.address,
+      formatOrderDetails_(pricedItems),
+      total,
+      hasUnconfirmedPrice ? 'Chờ xác nhận giá' : 'Đơn mới',
+      cleanOrder.note,
+    ]);
+
+    Logger.log(`generated order code: ${orderCodeInfo.orderCode}`);
+    Logger.log(`order sequence: ${orderCodeInfo.sequence}`);
+    Logger.log(`order date: ${orderCodeInfo.orderDate}`);
+
+    return {
+      success: true,
+      orderCode: orderCodeInfo.orderCode,
+      orderSequence: orderCodeInfo.sequence,
+      orderDate: orderCodeInfo.orderDate,
+      total,
+      hasUnconfirmedPrice,
+      message: hasUnconfirmedPrice
+        ? 'MISU đã nhận đơn. Một số dòng kệ cần xác nhận giá.'
+        : 'MISU đã nhận đơn của bạn.',
+    };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function setupMISUOrderApp() {
   const priceSheet = getOrCreateSheet_(PRICE_TABLE_SHEET, PRICE_HEADERS);
   const orderSheet = getOrCreateSheet_(WEB_ORDERS_SHEET, ORDER_HEADERS);
+  const counterSheet = getOrCreateSheet_(COUNTERS_SHEET, COUNTER_HEADERS);
 
   formatHeader_(priceSheet, PRICE_HEADERS.length);
   formatHeader_(orderSheet, ORDER_HEADERS.length);
+  formatHeader_(counterSheet, COUNTER_HEADERS.length);
 
   if (priceSheet.getLastRow() <= 1) {
     const defaultPriceRows = buildDefaultPriceRows_();
@@ -156,6 +181,8 @@ function setupMISUOrderApp() {
   orderSheet.getRange('B:B').setNumberFormat('dd/MM/yyyy HH:mm:ss');
   orderSheet.getRange('G:G').setNumberFormat('#,##0');
   orderSheet.getRange('F:F').setWrap(true).setVerticalAlignment('top');
+  counterSheet.autoResizeColumns(1, COUNTER_HEADERS.length);
+  counterSheet.getRange('D:D').setNumberFormat('dd/MM/yyyy HH:mm:ss');
 
   Logger.log('MISU Order App đã sẵn sàng.');
 }
@@ -269,6 +296,46 @@ function createPriceKey_(item) {
   ].join('|');
 }
 
+function generateOrderCode_() {
+  const timezone = Session.getScriptTimeZone();
+  const now = new Date();
+  const orderDate = Utilities.formatDate(now, timezone, 'yyMMdd');
+  const counterSheet = getOrCreateSheet_(COUNTERS_SHEET, COUNTER_HEADERS);
+  const counterRow = findCounterRow_(counterSheet, ORDER_COUNTER_KEY);
+  const lastDate = String(counterSheet.getRange(counterRow, 2).getValue() || '').trim();
+  const lastSequence = Number(counterSheet.getRange(counterRow, 3).getValue()) || 0;
+  const sequence = lastDate === orderDate ? lastSequence + 1 : 1;
+  const orderCode = `MISU-${orderDate}-${padNumber_(sequence, 3)}`;
+
+  counterSheet.getRange(counterRow, 1, 1, COUNTER_HEADERS.length)
+    .setValues([[ORDER_COUNTER_KEY, orderDate, sequence, now]]);
+
+  return {
+    orderCode,
+    orderDate,
+    sequence,
+  };
+}
+
+function findCounterRow_(sheet, counterKey) {
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow <= 1) {
+    sheet.appendRow([counterKey, '', 0, '']);
+    return 2;
+  }
+
+  const keys = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  const rowIndex = keys.findIndex(row => String(row[0] || '').trim() === counterKey);
+
+  if (rowIndex >= 0) {
+    return rowIndex + 2;
+  }
+
+  sheet.appendRow([counterKey, '', 0, '']);
+  return sheet.getLastRow();
+}
+
 function sanitizeOrderData_(orderData) {
   if (!orderData) {
     throw new Error('Không có dữ liệu đơn hàng.');
@@ -316,10 +383,8 @@ function clampChoice_(value, allowedValues, fallback) {
   return allowedValues.indexOf(numberValue) >= 0 ? numberValue : fallback;
 }
 
-function createOrderCode_() {
-  const dateText = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMddHHmmss');
-  const randomText = Math.floor(Math.random() * 900 + 100);
-  return `MISU-${dateText}-${randomText}`;
+function padNumber_(value, length) {
+  return String(value).padStart(length, '0');
 }
 
 function formatHeader_(sheet, columnCount) {

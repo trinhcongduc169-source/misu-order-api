@@ -7,7 +7,7 @@ function validateOrder(orderData) {
   const phone = normalizeText(orderData.phone);
   const address = normalizeText(orderData.address);
   const note = normalizeText(orderData.note);
-  const orderCode = normalizeText(orderData.orderCode) || createOrderCode();
+  const orderCode = normalizeText(orderData.orderCode);
   const items = Array.isArray(orderData.items) ? orderData.items : [];
 
   if (!customerName) {
@@ -94,25 +94,6 @@ function isValidPhone(phone) {
   return /^[0-9+\-\s().]{8,20}$/.test(phone);
 }
 
-function createOrderCode() {
-  const now = new Date();
-  const dateText = [
-    now.getFullYear(),
-    pad(now.getMonth() + 1),
-    pad(now.getDate()),
-    pad(now.getHours()),
-    pad(now.getMinutes()),
-    pad(now.getSeconds()),
-  ].join('');
-  const randomText = Math.floor(Math.random() * 900 + 100);
-
-  return `MISU-${dateText}-${randomText}`;
-}
-
-function pad(value) {
-  return String(value).padStart(2, '0');
-}
-
 function throwValidationError(message) {
   const error = new Error(message);
   error.statusCode = 400;
@@ -121,5 +102,4 @@ function throwValidationError(message) {
 
 module.exports = {
   validateOrder,
-  createOrderCode,
 };

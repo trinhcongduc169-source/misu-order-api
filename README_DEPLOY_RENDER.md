@@ -53,10 +53,34 @@ Khi deploy lên Render:
 Khách mở https://YOUR_RENDER_URL.onrender.com
 -> form gọi https://YOUR_RENDER_URL.onrender.com/orders
 -> Render Node.js gọi Apps Script /exec
+-> Apps Script tạo mã MISU-YYMMDD-XXX
 -> Apps Script ghi Google Sheet
 ```
 
 Server Render cũng phục vụ trực tiếp `index.html` tại trang chủ `/`, nên khách chỉ cần một link public.
+
+## Mã đơn hàng
+
+Mã đơn được tạo trong Apps Script, không tạo trong Render Node.js. Lý do:
+
+- Apps Script nằm cùng Google Sheet, dễ khóa ghi bằng `LockService`.
+- Sheet `COUNTERS` lưu số thứ tự cuối cùng, nên server Render restart vẫn không làm reset sai.
+- Nhiều khách gửi cùng lúc sẽ được xử lý tuần tự để tránh trùng mã.
+
+Format:
+
+```text
+MISU-YYMMDD-XXX
+```
+
+Ví dụ:
+
+```text
+MISU-260513-001
+MISU-260513-002
+```
+
+Sheet `COUNTERS` sẽ tự reset số thứ tự khi sang ngày mới.
 
 ## 4. Push GitHub
 
@@ -142,6 +166,9 @@ payload received:
 Apps Script status code:
 Apps Script content-type:
 Apps Script response preview:
+generated order code:
+order sequence:
+order date:
 Apps Script result:
 ```
 

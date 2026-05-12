@@ -12,6 +12,9 @@ router.post('/', async (req, res, next) => {
 
     const orderData = validateOrder(rawOrder);
     const data = await submitOrder(orderData);
+    console.log('generated order code:', data.orderCode);
+    console.log('order sequence:', data.orderSequence);
+    console.log('order date:', data.orderDate);
     console.log('Apps Script result:', JSON.stringify(data, null, 2));
 
     res.status(201).json({
