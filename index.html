@@ -155,24 +155,27 @@
     }
 
     .hero {
-      min-height: calc(100svh - 74px);
-      display: grid;
+      position: relative;
+      min-height: 80vh;
+      display: flex;
       align-items: center;
-      padding: 34px 18px 88px;
-      background:
-        radial-gradient(circle at 4% 86%, rgba(122, 86, 59, .13), transparent 16rem),
-        linear-gradient(90deg, rgba(255, 250, 242, .98) 0%, rgba(255, 250, 242, .88) 34%, rgba(243, 226, 206, .72) 100%);
+      padding: 72px 18px 118px;
+      background-image:
+        linear-gradient(90deg, rgba(255, 248, 238, .96) 0%, rgba(255, 248, 238, .82) 38%, rgba(255, 248, 238, .26) 68%, rgba(255, 248, 238, .08) 100%),
+        url("images/misu-banner.jpg.png");
+      background-size: cover;
+      background-position: center right;
       border-bottom: 1px solid rgba(107, 78, 55, .08);
+      overflow: hidden;
     }
 
     .hero .section-inner {
-      width: min(1460px, 100%);
+      width: min(1320px, 100%);
+      margin: 0 auto;
     }
 
     .hero-grid {
-      display: grid;
-      gap: 28px;
-      align-items: center;
+      display: block;
     }
 
     .hero-copy {
@@ -180,6 +183,7 @@
       z-index: 2;
       display: grid;
       gap: 20px;
+      max-width: 650px;
       padding-top: 8px;
     }
 
@@ -224,31 +228,7 @@
     }
 
     .hero-media {
-      position: relative;
-      min-height: 420px;
-      overflow: hidden;
-      border-radius: 34px;
-      background: var(--milk);
-      box-shadow: 0 28px 80px rgba(43, 33, 26, .16);
-    }
-
-    .hero-media img {
-      object-fit: cover;
-      object-position: center;
-    }
-
-    .hero-media::after {
-      content: "MISU module shelf";
-      position: absolute;
-      left: 18px;
-      bottom: 18px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255, 253, 248, .86);
-      color: var(--walnut-dark);
-      font-size: 13px;
-      font-weight: 800;
-      backdrop-filter: blur(12px);
+      display: none;
     }
 
     .section {
@@ -749,21 +729,35 @@
       }
 
       .hero {
-        min-height: auto;
-        padding: 34px 14px 76px;
+        min-height: 680px;
+        padding: 44px 14px 96px;
+        align-items: flex-start;
+        background-image:
+          linear-gradient(180deg, rgba(255, 248, 238, .98) 0%, rgba(255, 248, 238, .88) 42%, rgba(255, 248, 238, .22) 100%),
+          url("images/misu-banner.jpg.png");
+        background-size: cover;
+        background-position: 62% center;
+      }
+
+      .hero .section-inner {
+        width: 100%;
+      }
+
+      .hero-copy {
+        max-width: 520px;
       }
 
       h1 {
-        font-size: clamp(38px, 13vw, 54px);
-      }
-
-      .hero-media {
-        min-height: 430px;
+        font-size: clamp(38px, 12vw, 54px);
       }
 
       .benefits {
         margin-top: -44px;
         padding-bottom: 42px;
+      }
+
+      .section {
+        padding: 46px 14px;
       }
 
       .set-card {
@@ -781,20 +775,17 @@
       }
 
       .hero {
-        padding: 54px 28px 112px;
+        min-height: 720px;
+        padding: 76px 28px 126px;
+        background-position: center right;
       }
 
       .hero .section-inner {
-        width: min(1460px, 100%);
+        width: min(1320px, 100%);
       }
 
       .hero-grid {
-        grid-template-columns: minmax(360px, .82fr) minmax(600px, 1.18fr);
-        gap: 42px;
-      }
-
-      .hero-media {
-        min-height: 640px;
+        display: block;
       }
 
       .section {
@@ -803,14 +794,6 @@
 
       .set-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .set-card {
-        grid-template-columns: 1fr;
-      }
-
-      .set-image {
-        min-height: 230px;
       }
 
       .benefit-grid {
@@ -888,9 +871,6 @@
               <a class="btn btn-secondary" href="#sets">Xem set m&#7851;u</a>
             </div>
           </div>
-          <figure class="hero-media">
-            <img src="images/misu-banner.jpg.png" alt="Kệ module MISU trong không gian sống tối giản">
-          </figure>
         </div>
       </section>
 
