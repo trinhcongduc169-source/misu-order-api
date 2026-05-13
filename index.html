@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-  <title>MISU — Kệ module thông minh</title>
-  <meta name="description" content="Kệ module MISU cho căn nhà gọn và đẹp hơn. Lắp nhanh, không khoan tường, dễ mở rộng.">
+  <title>MISU &mdash; K&#7879; module th&#244;ng minh</title>
+  <meta name="description" content="K&#7879; module MISU cho c&#259;n nh&#224; g&#7885;n v&#224; &#273;&#7865;p h&#417;n. L&#7855;p nhanh, kh&#244;ng khoan t&#432;&#7901;ng, d&#7877; m&#7903; r&#7897;ng.">
   <style>
     :root {
       --cream: #fbf6ed;
@@ -74,11 +74,11 @@
     .nav {
       position: sticky;
       top: 0;
-      z-index: 20;
-      padding: 12px 14px;
-      background: rgba(251, 246, 237, 0.82);
+      z-index: 30;
+      padding: 18px 18px;
+      background: rgba(251, 246, 237, 0.72);
       border-bottom: 1px solid rgba(107, 78, 55, 0.08);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(18px);
     }
 
     .nav-inner,
@@ -104,14 +104,15 @@
     }
 
     .brand-dot {
-      width: 32px;
-      height: 32px;
+      width: 38px;
+      height: 38px;
       display: grid;
       place-items: center;
       border-radius: 50%;
       background: var(--walnut-dark);
       color: var(--paper);
-      font-size: 12px;
+      font-size: 13px;
+      font-weight: 900;
     }
 
     .nav-links {
@@ -154,18 +155,31 @@
     }
 
     .hero {
-      padding: 30px 14px 34px;
+      min-height: calc(100svh - 74px);
+      display: grid;
+      align-items: center;
+      padding: 34px 18px 88px;
+      background:
+        radial-gradient(circle at 4% 86%, rgba(122, 86, 59, .13), transparent 16rem),
+        linear-gradient(90deg, rgba(255, 250, 242, .98) 0%, rgba(255, 250, 242, .88) 34%, rgba(243, 226, 206, .72) 100%);
+      border-bottom: 1px solid rgba(107, 78, 55, .08);
+    }
+
+    .hero .section-inner {
+      width: min(1460px, 100%);
     }
 
     .hero-grid {
       display: grid;
-      gap: 22px;
+      gap: 28px;
       align-items: center;
     }
 
     .hero-copy {
+      position: relative;
+      z-index: 2;
       display: grid;
-      gap: 18px;
+      gap: 20px;
       padding-top: 8px;
     }
 
@@ -189,9 +203,9 @@
       max-width: 680px;
       margin-bottom: 0;
       color: var(--walnut-dark);
-      font-size: clamp(38px, 8vw, 64px);
-      line-height: 1.03;
-      letter-spacing: 0;
+      font-size: clamp(40px, 6.4vw, 86px);
+      line-height: .98;
+      letter-spacing: -0.02em;
       text-wrap: balance;
     }
 
@@ -211,29 +225,29 @@
 
     .hero-media {
       position: relative;
-      min-height: 460px;
+      min-height: 420px;
       overflow: hidden;
-      border-radius: 30px;
+      border-radius: 34px;
       background: var(--milk);
-      box-shadow: var(--shadow);
+      box-shadow: 0 28px 80px rgba(43, 33, 26, .16);
     }
 
     .hero-media img {
-      object-fit: contain;
-      background: #eadfce;
+      object-fit: cover;
+      object-position: center;
     }
 
     .hero-media::after {
       content: "MISU module shelf";
       position: absolute;
-      left: 16px;
-      bottom: 16px;
-      padding: 9px 12px;
+      left: 18px;
+      bottom: 18px;
+      padding: 10px 14px;
       border-radius: 999px;
-      background: rgba(255, 253, 248, .82);
+      background: rgba(255, 253, 248, .86);
       color: var(--walnut-dark);
       font-size: 13px;
-      font-weight: 760;
+      font-weight: 800;
       backdrop-filter: blur(12px);
     }
 
@@ -262,35 +276,46 @@
     }
 
     .benefits {
-      padding-top: 8px;
+      position: relative;
+      z-index: 5;
+      margin-top: -60px;
+      padding: 0 18px 58px;
     }
 
     .benefit-grid {
+      width: min(1240px, 100%);
+      margin: 0 auto;
       display: grid;
-      gap: 10px;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid rgba(107, 78, 55, .14);
+      border-radius: 28px;
+      background: rgba(255, 253, 248, .88);
+      box-shadow: 0 22px 60px rgba(43, 33, 26, .12);
+      backdrop-filter: blur(16px);
     }
 
     .benefit {
       display: grid;
       grid-template-columns: auto 1fr;
-      gap: 10px 12px;
-      min-height: 112px;
-      padding: 16px;
-      border: 1px solid var(--line);
+      gap: 8px 12px;
+      min-height: 106px;
+      padding: 14px;
       border-radius: 20px;
-      background: rgba(255, 253, 248, .74);
+      background: transparent;
     }
 
     .check {
-      width: 32px;
-      height: 32px;
+      width: 42px;
+      height: 42px;
       flex: 0 0 auto;
       display: grid;
       place-items: center;
       border-radius: 50%;
-      background: rgba(71, 111, 92, .12);
-      color: var(--ok);
+      background: rgba(122, 86, 59, .11);
+      color: var(--walnut);
       font-weight: 900;
+      font-size: 20px;
     }
 
     .benefit strong {
@@ -307,24 +332,29 @@
 
     .set-grid {
       display: grid;
-      gap: 14px;
+      gap: 16px;
     }
 
     .set-card {
+      display: grid;
+      grid-template-columns: minmax(150px, .95fr) minmax(0, 1fr);
+      align-items: stretch;
       overflow: hidden;
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      background: var(--paper);
+      background: rgba(255, 253, 248, .84);
       box-shadow: var(--shadow);
     }
 
     .set-image {
-      height: 300px;
+      min-height: 210px;
+      height: 100%;
       background: var(--milk);
     }
 
     .set-image img {
       object-fit: cover;
+      object-position: center;
     }
 
     .set-body {
@@ -713,26 +743,58 @@
       }
     }
 
+    @media (max-width: 719px) {
+      .nav {
+        padding: 12px;
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 34px 14px 76px;
+      }
+
+      h1 {
+        font-size: clamp(38px, 13vw, 54px);
+      }
+
+      .hero-media {
+        min-height: 430px;
+      }
+
+      .benefits {
+        margin-top: -44px;
+        padding-bottom: 42px;
+      }
+
+      .set-card {
+        grid-template-columns: 1fr;
+      }
+
+      .set-image {
+        min-height: 260px;
+      }
+    }
+
     @media (min-width: 720px) {
       .nav-links {
         display: flex;
       }
 
       .hero {
-        padding: 58px 22px 46px;
+        padding: 54px 28px 112px;
       }
 
       .hero .section-inner {
-        width: min(1400px, 100%);
+        width: min(1460px, 100%);
       }
 
       .hero-grid {
-        grid-template-columns: minmax(360px, .72fr) minmax(640px, 1.28fr);
-        gap: 34px;
+        grid-template-columns: minmax(360px, .82fr) minmax(600px, 1.18fr);
+        gap: 42px;
       }
 
       .hero-media {
-        min-height: 660px;
+        min-height: 640px;
       }
 
       .section {
@@ -741,6 +803,14 @@
 
       .set-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .set-card {
+        grid-template-columns: 1fr;
+      }
+
+      .set-image {
+        min-height: 230px;
       }
 
       .benefit-grid {
@@ -793,16 +863,16 @@
   <div class="page">
     <header class="nav">
       <div class="nav-inner">
-        <a class="brand" href="#top" aria-label="MISU">
+        <a class="brand" href="#top" aria-label="Dieu huong">
           <span class="brand-dot">M</span>
           <span>MISU</span>
         </a>
         <nav class="nav-links" aria-label="Điều hướng">
-          <a href="#product">Sản phẩm</a>
-          <a href="#sets">Ứng dụng</a>
-          <a href="#order">Đặt kệ</a>
+          <a href="#product">S&#7843;n ph&#7849;m</a>
+          <a href="#sets">&#7912;ng d&#7909;ng</a>
+          <a href="#order">&#272;&#7863;t k&#7879;</a>
         </nav>
-        <a class="btn btn-primary" href="#order">Đặt kệ</a>
+        <a class="btn btn-primary" href="#order">&#272;&#7863;t k&#7879;</a>
       </div>
     </header>
 
@@ -810,16 +880,16 @@
       <section id="top" class="hero">
         <div class="section-inner hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow">MISU module shelf</p>
-            <h1>Kệ module cho căn nhà gọn và đẹp hơn.</h1>
-            <p class="lead">Lắp nhanh. Không khoan tường. Dễ mở rộng khi không gian thay đổi.</p>
+            <p class="eyebrow">K&#7879; module MISU</p>
+            <h1>K&#7879; module cho c&#259;n nh&#224; g&#7885;n v&#224; &#273;&#7865;p h&#417;n.</h1>
+            <p class="lead">L&#7855;p nhanh. Kh&#244;ng khoan t&#432;&#7901;ng. D&#7877; d&#224;ng thay &#273;&#7893;i theo nhu c&#7847;u.</p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="#order">Đặt kệ ngay</a>
-              <a class="btn btn-secondary" href="#sets">Xem set mẫu</a>
+              <a class="btn btn-primary" href="#order">&#272;&#7863;t k&#7879; ngay</a>
+              <a class="btn btn-secondary" href="#sets">Xem set m&#7851;u</a>
             </div>
           </div>
           <figure class="hero-media">
-            <img src="images/misu-banner.jpg.png" alt="Kệ module MISU trong không gian sống tối giản">
+            <img src="images/misu-banner.jpg" alt="Kệ module MISU trong không gian sống tối giản">
           </figure>
         </div>
       </section>
@@ -860,7 +930,7 @@
           <div class="set-grid">
             <article class="set-card">
               <div class="set-image">
-                <img src="images/misu-kitchen.jpg.png" alt="K&#7879; MISU g&#243;c b&#7871;p" loading="lazy">
+                <img src="images/misu-kitchen.jpg" alt="K&#7879; MISU g&#243;c b&#7871;p" loading="lazy">
               </div>
               <div class="set-body">
                 <h3>G&#243;c b&#7871;p</h3>
@@ -870,7 +940,7 @@
 
             <article class="set-card">
               <div class="set-image">
-                <img src="images/misu-workspace.jpg.png" alt="K&#7879; MISU g&#243;c l&#224;m vi&#7879;c" loading="lazy">
+                <img src="images/misu-workspace.jpg" alt="K&#7879; MISU g&#243;c l&#224;m vi&#7879;c" loading="lazy">
               </div>
               <div class="set-body">
                 <h3>G&#243;c l&#224;m vi&#7879;c</h3>
@@ -880,7 +950,7 @@
 
             <article class="set-card">
               <div class="set-image">
-                <img src="images/misu-livingroom.jpg.png" alt="K&#7879; MISU ph&#242;ng kh&#225;ch" loading="lazy">
+                <img src="images/misu-livingroom.jpg" alt="K&#7879; MISU ph&#242;ng kh&#225;ch" loading="lazy">
               </div>
               <div class="set-body">
                 <h3>K&#7879; ph&#242;ng kh&#225;ch</h3>
