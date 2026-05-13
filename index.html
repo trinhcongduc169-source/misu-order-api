@@ -725,18 +725,35 @@
 
     @media (max-width: 719px) {
       .nav {
-        padding: 12px;
+        padding: 10px 14px;
+      }
+
+      .brand {
+        gap: 9px;
+        font-size: 15px;
+      }
+
+      .brand-dot {
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
+      }
+
+      .nav .btn-primary {
+        min-height: 42px;
+        padding: 0 17px;
+        font-size: 15px;
       }
 
       .hero {
-        min-height: 680px;
-        padding: 44px 14px 96px;
+        min-height: 620px;
+        padding: 34px 14px 84px;
         align-items: flex-start;
         background-image:
-          linear-gradient(180deg, rgba(255, 248, 238, .98) 0%, rgba(255, 248, 238, .88) 42%, rgba(255, 248, 238, .22) 100%),
+          linear-gradient(180deg, rgba(255, 248, 238, .98) 0%, rgba(255, 248, 238, .9) 38%, rgba(255, 248, 238, .34) 100%),
           url("images/misu-banner.jpg.png");
         background-size: cover;
-        background-position: 62% center;
+        background-position: 58% center;
       }
 
       .hero .section-inner {
@@ -744,20 +761,78 @@
       }
 
       .hero-copy {
-        max-width: 520px;
+        max-width: 360px;
+        gap: 14px;
+        padding-top: 18px;
+      }
+
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: .12em;
       }
 
       h1 {
-        font-size: clamp(38px, 12vw, 54px);
+        max-width: 340px;
+        font-size: clamp(36px, 10.6vw, 44px);
+        line-height: 1.02;
+      }
+
+      .lead {
+        max-width: 330px;
+        font-size: 17px;
+        line-height: 1.45;
+      }
+
+      .hero-actions {
+        gap: 8px;
+      }
+
+      .hero-actions .btn {
+        min-height: 44px;
+        padding: 0 17px;
+        font-size: 15px;
       }
 
       .benefits {
-        margin-top: -44px;
-        padding-bottom: 42px;
+        margin-top: -34px;
+        padding: 0 14px 34px;
+      }
+
+      .benefit-grid {
+        gap: 8px;
+        padding: 12px;
+        border-radius: 24px;
+      }
+
+      .benefit {
+        min-height: 0;
+        grid-template-columns: 34px 1fr;
+        gap: 4px 10px;
+        padding: 10px 8px;
+      }
+
+      .check {
+        width: 34px;
+        height: 34px;
+        font-size: 17px;
+      }
+
+      .benefit strong {
+        font-size: 16px;
+        line-height: 1.25;
+      }
+
+      .benefit p {
+        font-size: 14px;
+        line-height: 1.38;
       }
 
       .section {
-        padding: 46px 14px;
+        padding: 42px 14px;
+      }
+
+      .section-title {
+        font-size: clamp(28px, 8.4vw, 36px);
       }
 
       .set-card {
@@ -765,7 +840,23 @@
       }
 
       .set-image {
-        min-height: 260px;
+        min-height: 245px;
+      }
+
+      .mobile-cta {
+        left: 10px;
+        right: 10px;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+        padding: 8px 8px 8px 13px;
+      }
+
+      .mobile-total {
+        font-size: 14px;
+      }
+
+      .mobile-cta .btn {
+        min-height: 42px;
+        padding: 0 16px;
       }
     }
 
