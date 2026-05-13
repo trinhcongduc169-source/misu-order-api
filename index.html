@@ -211,11 +211,16 @@
 
     .hero-media {
       position: relative;
-      min-height: 390px;
+      min-height: 460px;
       overflow: hidden;
       border-radius: 30px;
       background: var(--milk);
       box-shadow: var(--shadow);
+    }
+
+    .hero-media img {
+      object-fit: contain;
+      background: #eadfce;
     }
 
     .hero-media::after {
@@ -266,10 +271,10 @@
     }
 
     .benefit {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-height: 76px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px 12px;
+      min-height: 112px;
       padding: 16px;
       border: 1px solid var(--line);
       border-radius: 20px;
@@ -292,6 +297,14 @@
       color: var(--walnut-dark);
     }
 
+    .benefit p {
+      grid-column: 2;
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
     .set-grid {
       display: grid;
       gap: 14px;
@@ -306,8 +319,12 @@
     }
 
     .set-image {
-      height: 260px;
+      height: 300px;
       background: var(--milk);
+    }
+
+    .set-image img {
+      object-fit: cover;
     }
 
     .set-body {
@@ -334,6 +351,99 @@
       display: grid;
       gap: 16px;
       align-items: start;
+    }
+
+    .size-guide {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 16px;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 253, 248, .84);
+      box-shadow: var(--shadow);
+    }
+
+    .size-guide h3 {
+      margin: 0;
+      color: var(--walnut-dark);
+      font-size: 20px;
+    }
+
+    .size-visual {
+      position: relative;
+      min-height: 210px;
+      display: grid;
+      place-items: center;
+      border-radius: 20px;
+      background:
+        linear-gradient(90deg, rgba(107, 78, 55, .08) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(107, 78, 55, .08) 1px, transparent 1px),
+        rgba(251, 246, 237, .68);
+      background-size: 28px 28px;
+      overflow: hidden;
+    }
+
+    .shelf-wireframe {
+      width: min(210px, 68vw);
+      aspect-ratio: 1 / 1.18;
+      display: grid;
+      grid-template-rows: repeat(4, 1fr);
+      border: 2px solid var(--walnut-dark);
+      border-radius: 10px;
+      transform: perspective(420px) rotateY(-12deg);
+      box-shadow: 18px 14px 0 rgba(122, 86, 59, .12);
+    }
+
+    .shelf-wireframe span {
+      border-bottom: 2px solid var(--walnut-dark);
+    }
+
+    .shelf-wireframe span:last-child {
+      border-bottom: 0;
+    }
+
+    .dimension-label {
+      position: absolute;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      color: var(--walnut-dark);
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 8px 22px rgba(43, 33, 26, .08);
+    }
+
+    .dimension-height {
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+    }
+
+    .dimension-width {
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+    }
+
+    .dimension-depth {
+      right: 12px;
+      top: 34px;
+    }
+
+    .size-notes {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .size-notes strong {
+      color: var(--walnut-dark);
     }
 
     .order-card,
@@ -612,21 +722,29 @@
         padding: 58px 22px 46px;
       }
 
+      .hero .section-inner {
+        width: min(1400px, 100%);
+      }
+
       .hero-grid {
-        grid-template-columns: minmax(0, .9fr) minmax(380px, 1.1fr);
+        grid-template-columns: minmax(360px, .72fr) minmax(640px, 1.28fr);
+        gap: 34px;
       }
 
       .hero-media {
-        min-height: 520px;
+        min-height: 660px;
       }
 
       .section {
         padding: 58px 22px;
       }
 
-      .benefit-grid,
       .set-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .benefit-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
 
       .customer-grid {
@@ -709,16 +827,24 @@
       <section id="product" class="section benefits">
         <div class="section-inner benefit-grid">
           <div class="benefit">
-            <span class="check">✓</span>
-            <strong>Không khoan tường</strong>
+            <span class="check">&check;</span>
+            <strong>L&#7855;p nhanh, ti&#7879;n l&#7907;i</strong>
+            <p>D&#7877; l&#7855;p &#273;&#7863;t, d&#7877; th&#225;o r&#7901;i, kh&#244;ng c&#7847;n khoan t&#432;&#7901;ng.</p>
           </div>
           <div class="benefit">
-            <span class="check">✓</span>
-            <strong>Ghép module linh hoạt</strong>
+            <span class="check">&check;</span>
+            <strong>Gh&#233;p module linh ho&#7841;t</strong>
+            <p>M&#7903; r&#7897;ng th&#234;m t&#7847;ng, th&#234;m khoang khi nhu c&#7847;u thay &#273;&#7893;i.</p>
           </div>
           <div class="benefit">
-            <span class="check">✓</span>
-            <strong>Tháo lắp, chuyển nhà dễ</strong>
+            <span class="check">&check;</span>
+            <strong>Ph&#249; h&#7907;p nhi&#7873;u lo&#7841;i kh&#244;ng gian</strong>
+            <p>D&#249;ng &#273;&#432;&#7907;c cho b&#7871;p, b&#224;n l&#224;m vi&#7879;c, ph&#242;ng ng&#7911;, ph&#242;ng kh&#225;ch.</p>
+          </div>
+          <div class="benefit">
+            <span class="check">&check;</span>
+            <strong>&#272;&#7843;m b&#7843;o ch&#7855;c ch&#7855;n</strong>
+            <p>Khung kim lo&#7841;i v&#7919;ng, m&#7863;t k&#7879; &#7893;n &#273;&#7883;nh, d&#249;ng h&#7857;ng ng&#224;y y&#234;n t&#226;m.</p>
           </div>
         </div>
       </section>
@@ -734,31 +860,31 @@
           <div class="set-grid">
             <article class="set-card">
               <div class="set-image">
-                <img src="images/misu-banner.jpg.png" alt="Kệ module cho góc bếp" loading="lazy">
+                <img src="images/misu-kitchen.jpg.png" alt="K&#7879; MISU g&#243;c b&#7871;p" loading="lazy">
               </div>
               <div class="set-body">
-                <h3>Góc bếp</h3>
-                <p>Gọn đồ khô, ly tách, máy pha cafe.</p>
+                <h3>G&#243;c b&#7871;p</h3>
+                <p>G&#7885;n &#273;&#7891; kh&#244;, ly t&#225;ch, m&#225;y pha, l&#242; n&#432;&#7899;ng mini.</p>
               </div>
             </article>
 
             <article class="set-card">
               <div class="set-image">
-                <img src="images/misu-banner.jpg.png" alt="Kệ module cho góc làm việc" loading="lazy">
+                <img src="images/misu-workspace.jpg.png" alt="K&#7879; MISU g&#243;c l&#224;m vi&#7879;c" loading="lazy">
               </div>
               <div class="set-body">
-                <h3>Góc làm việc</h3>
-                <p>Sách, hồ sơ và decor vừa đủ nhìn.</p>
+                <h3>G&#243;c l&#224;m vi&#7879;c</h3>
+                <p>&#272;&#7863;t s&#225;ch, h&#7891; s&#417;, m&#225;y in, &#273;&#7891; d&#249;ng l&#224;m vi&#7879;c.</p>
               </div>
             </article>
 
             <article class="set-card">
               <div class="set-image">
-                <img src="images/misu-banner.jpg.png" alt="Kệ decor phòng khách" loading="lazy">
+                <img src="images/misu-livingroom.jpg.png" alt="K&#7879; MISU ph&#242;ng kh&#225;ch" loading="lazy">
               </div>
               <div class="set-body">
-                <h3>Kệ decor</h3>
-                <p>Tạo điểm nhấn nhẹ cho phòng khách.</p>
+                <h3>K&#7879; ph&#242;ng kh&#225;ch</h3>
+                <p>L&#432;u tr&#7919; &#273;&#7865;p nh&#432; n&#7897;i th&#7845;t, b&#224;y s&#225;ch, c&#226;y, &#273;&#232;n v&#224; &#273;&#7891; trang tr&#237;.</p>
               </div>
             </article>
           </div>
@@ -775,6 +901,22 @@
           </div>
 
           <div class="order-layout">
+            <div>
+              <section class="size-guide" aria-label="Minh hoa kich thuoc ke">
+                <h3>K&#237;ch th&#432;&#7899;c k&#7879;</h3>
+                <div class="size-visual">
+                  <div class="shelf-wireframe" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                  <span class="dimension-label dimension-height">Chi&#7873;u cao</span>
+                  <span class="dimension-label dimension-width">Chi&#7873;u r&#7897;ng</span>
+                  <span class="dimension-label dimension-depth">Chi&#7873;u s&#226;u</span>
+                </div>
+                <ul class="size-notes">
+                  <li><strong>Chi&#7873;u cao:</strong> ch&#7885;n theo m&#7851;u</li>
+                  <li><strong>Chi&#7873;u r&#7897;ng:</strong> ch&#7885;n theo module</li>
+                  <li><strong>Chi&#7873;u s&#226;u:</strong> 30 / 35 / 40 / 45 / 50 cm</li>
+                </ul>
+              </section>
+
             <section class="order-card" aria-label="Form đặt kệ">
               <div class="customer-grid">
                 <label>
@@ -802,6 +944,7 @@
 
               <div id="formMessage" class="message" role="status"></div>
             </section>
+            </div>
 
             <aside class="summary-card" aria-label="Hóa đơn tạm tính">
               <div class="summary-head">
