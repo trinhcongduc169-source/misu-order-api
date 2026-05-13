@@ -2,22 +2,31 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>MISU Order App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>MISU — Kệ module thông minh</title>
+  <meta name="description" content="MISU — kệ module thông minh cho không gian sống hiện đại. Lắp ráp nhanh, không khoan tường, mở rộng linh hoạt.">
   <style>
     :root {
-      --walnut: #6f4e37;
-      --walnut-dark: #3f2d23;
-      --beige: #e8dcc7;
-      --cream: #fffaf2;
-      --paper: #ffffff;
-      --ink: #2f2924;
-      --muted: #7c7067;
-      --line: #ded2c0;
-      --ok: #31705b;
-      --warn: #a36b21;
-      --danger: #9d3b30;
-      --shadow: 0 18px 45px rgba(63, 45, 35, 0.12);
+      --cream: #fbf6ec;
+      --paper: #fffdf8;
+      --milk: #f4eadb;
+      --sand: #ded0bd;
+      --linen: #efe4d2;
+      --walnut: #7a563b;
+      --walnut-dark: #2f241d;
+      --ink: #211c18;
+      --muted: #766b61;
+      --soft: rgba(122, 86, 59, 0.12);
+      --line: rgba(122, 86, 59, 0.16);
+      --ok: #416f5a;
+      --danger: #9f3f35;
+      --shadow: 0 24px 70px rgba(47, 36, 29, 0.12);
+      --shadow-soft: 0 14px 40px rgba(47, 36, 29, 0.08);
+      --radius-xl: 34px;
+      --radius-lg: 26px;
+      --radius-md: 18px;
+      --max: 1180px;
+      --ease: cubic-bezier(.2, .8, .2, 1);
     }
 
     * {
@@ -25,325 +34,713 @@
     }
 
     html {
-      width: 100%;
-      min-width: 0;
-      overflow-x: hidden;
+      scroll-behavior: smooth;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
-      touch-action: manipulation;
     }
 
     body {
       margin: 0;
-      width: 100%;
-      min-width: 0;
-      min-height: 100vh;
+      min-width: 320px;
       overflow-x: hidden;
       background:
-        linear-gradient(135deg, rgba(232, 220, 199, 0.58), rgba(255, 250, 242, 0.96)),
-        var(--cream);
+        radial-gradient(circle at 12% 3%, rgba(255, 255, 255, 0.88), transparent 26rem),
+        linear-gradient(180deg, #fffaf1 0%, var(--cream) 42%, #f6eddf 100%);
       color: var(--ink);
-      font-family: Arial, "Helvetica Neue", sans-serif;
       font-size: 16px;
-      line-height: 1.5;
-      -webkit-text-size-adjust: 100%;
-      text-size-adjust: 100%;
+      line-height: 1.6;
     }
 
-    .page {
-      width: min(1120px, 100%);
-      max-width: 100vw;
-      margin: 0 auto;
-      padding: 28px 18px 44px;
-      overflow-x: hidden;
+    body.locked {
+      overflow: hidden;
     }
 
-    .topbar {
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+    }
+
+    .site-shell {
+      overflow: hidden;
+    }
+
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 40;
       display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 18px;
-      margin-bottom: 22px;
-      padding: 0 2px;
+      justify-content: center;
+      padding: 14px 14px 0;
+      pointer-events: none;
     }
 
-    .brand {
+    .nav-inner {
+      width: min(var(--max), 100%);
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 12px 10px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      border-radius: 999px;
+      background: rgba(255, 250, 241, 0.72);
+      box-shadow: 0 18px 60px rgba(47, 36, 29, 0.12);
+      backdrop-filter: blur(18px);
+      pointer-events: auto;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--walnut-dark);
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    .brand-symbol {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--walnut-dark);
+      color: var(--cream);
+      font-size: 12px;
+      letter-spacing: .04em;
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 26px;
+      color: rgba(33, 28, 24, .72);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .nav-cta,
+    .btn-primary,
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 760;
+      transition: transform .22s var(--ease), box-shadow .22s var(--ease), background .22s var(--ease), color .22s var(--ease);
+    }
+
+    .nav-cta,
+    .btn-primary {
+      background: var(--walnut-dark);
+      color: #fff9ef;
+      box-shadow: 0 16px 34px rgba(47, 36, 29, 0.22);
+      padding: 0 22px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, .72);
+      color: var(--walnut-dark);
+      border: 1px solid var(--line);
+      padding: 0 18px;
+    }
+
+    .nav-cta:hover,
+    .btn-primary:hover,
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+    }
+
+    .hero {
+      min-height: 100svh;
+      position: relative;
+      display: grid;
+      align-items: end;
+      padding: 112px 14px 22px;
+      color: #fffaf1;
+      isolation: isolate;
+    }
+
+    .hero-media {
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(180deg, rgba(23, 18, 15, .18), rgba(23, 18, 15, .68)),
+        url("https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2200&q=86") center/cover;
+      transform: scale(1.02);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 36%;
+      z-index: -1;
+      background: linear-gradient(180deg, transparent, rgba(251, 246, 236, .95));
+    }
+
+    .hero-content {
+      width: min(var(--max), 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 26px;
+      padding-bottom: clamp(38px, 8vw, 96px);
+      animation: riseIn .9s var(--ease) both;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 13px;
+      border: 1px solid rgba(255, 255, 255, .34);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .12);
+      backdrop-filter: blur(12px);
+      color: rgba(255, 250, 241, .92);
+      font-size: 12px;
+      font-weight: 780;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      max-width: 940px;
+      margin: 0;
+      font-size: clamp(42px, 10vw, 92px);
+      line-height: .96;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .hero-copy {
+      max-width: 680px;
+      margin: 0;
+      color: rgba(255, 250, 241, .9);
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 560;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hero-note {
+      color: rgba(255, 250, 241, .8);
+      font-size: 14px;
+    }
+
+    .section {
+      padding: clamp(72px, 11vw, 132px) 18px;
+    }
+
+    .section-inner {
+      width: min(var(--max), 100%);
+      margin: 0 auto;
+    }
+
+    .section-head {
+      display: grid;
+      gap: 14px;
+      margin-bottom: clamp(28px, 6vw, 56px);
+    }
+
+    .section-kicker {
+      margin: 0;
+      color: var(--walnut);
+      font-size: 12px;
+      font-weight: 820;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      max-width: 820px;
       margin: 0;
       color: var(--walnut-dark);
-      font-size: clamp(28px, 5vw, 46px);
-      font-weight: 700;
+      font-size: clamp(31px, 6.5vw, 62px);
+      line-height: 1.02;
       letter-spacing: 0;
+      text-wrap: balance;
     }
 
-    .tagline {
-      margin: 4px 0 0;
+    .section-text {
+      max-width: 670px;
+      margin: 0;
       color: var(--muted);
-      font-size: 15px;
+      font-size: clamp(16px, 2.2vw, 19px);
     }
 
-    .layout {
+    .trust-bar {
+      position: relative;
+      z-index: 4;
+      margin-top: -22px;
+      padding: 0 18px;
+    }
+
+    .trust-inner {
+      width: min(var(--max), 100%);
+      margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid rgba(122, 86, 59, .12);
+      border-radius: var(--radius-lg);
+      background: rgba(255, 253, 248, .86);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(18px);
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 10px;
+      border-radius: 18px;
+      color: var(--walnut-dark);
+      font-size: 14px;
+      font-weight: 740;
+    }
+
+    .trust-icon {
+      width: 28px;
+      height: 28px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(65, 111, 90, .12);
+      color: var(--ok);
+    }
+
+    .story-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .pain-card,
+    .solution-card,
+    .review-card,
+    .video-card,
+    .order-panel,
+    .summary-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: rgba(255, 253, 248, .72);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .pain-card {
+      min-height: 190px;
+      display: grid;
+      align-content: end;
+      gap: 12px;
+      padding: 24px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .pain-card::before {
+      content: attr(data-index);
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      color: rgba(122, 86, 59, .12);
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .pain-card h3,
+    .solution-card h3,
+    .video-card h3,
+    .review-card h3 {
+      margin: 0;
+      color: var(--walnut-dark);
+      font-size: 22px;
+      line-height: 1.15;
+    }
+
+    .pain-card p,
+    .solution-card p,
+    .video-card p,
+    .review-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .solution {
+      background: linear-gradient(180deg, rgba(255, 253, 248, 0), rgba(255, 253, 248, .76));
+    }
+
+    .solution-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .solution-feature {
+      position: relative;
+      min-height: 420px;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      background: var(--walnut-dark);
+    }
+
+    .solution-feature img {
+      opacity: .9;
+    }
+
+    .feature-caption {
+      position: absolute;
+      inset: auto 18px 18px;
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255, 250, 241, .82);
+      backdrop-filter: blur(18px);
+    }
+
+    .feature-caption p {
+      margin: 0;
+      color: var(--walnut-dark);
+      font-weight: 760;
+    }
+
+    .solution-cards {
+      display: grid;
+      gap: 14px;
+    }
+
+    .solution-card {
+      padding: 22px;
+      transition: transform .24s var(--ease), box-shadow .24s var(--ease);
+    }
+
+    .solution-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 18px;
+      border-radius: 16px;
+      background: rgba(122, 86, 59, .11);
+      color: var(--walnut);
+      font-size: 20px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      min-height: 260px;
+      border-radius: var(--radius-lg);
+      background: var(--linen);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .gallery-item.tall {
+      min-height: 380px;
+    }
+
+    .gallery-label {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255, 250, 241, .82);
+      color: var(--walnut-dark);
+      font-size: 13px;
+      font-weight: 760;
+      backdrop-filter: blur(12px);
+    }
+
+    .video-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .video-card {
+      overflow: hidden;
+      background: var(--paper);
+    }
+
+    .video-frame {
+      position: relative;
+      min-height: 240px;
+      overflow: hidden;
+      background: #211c18;
+    }
+
+    .video-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent, rgba(20, 15, 12, .42));
+    }
+
+    .play-button {
+      position: absolute;
+      inset: 50% auto auto 50%;
+      z-index: 2;
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 253, 248, .84);
+      color: var(--walnut-dark);
+      font-size: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .video-body {
+      padding: 20px;
+    }
+
+    .configurator {
+      background:
+        linear-gradient(180deg, rgba(255, 253, 248, .2), rgba(239, 228, 210, .62)),
+        var(--paper);
+    }
+
+    .config-layout {
+      display: grid;
       gap: 18px;
       align-items: start;
     }
 
-    .panel,
-    .invoice {
-      background: rgba(255, 255, 255, 0.88);
-      border: 1px solid rgba(222, 210, 192, 0.9);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-    }
-
-    .panel {
+    .order-panel,
+    .summary-card {
       padding: 18px;
-    }
-
-    .invoice {
-      position: sticky;
-      top: 18px;
-      padding: 18px;
-    }
-
-    .section-title {
-      margin: 0 0 14px;
-      font-size: 18px;
-      color: var(--walnut-dark);
-    }
-
-    .customer-grid,
-    .shelf-grid {
-      display: grid;
-      gap: 12px;
     }
 
     .customer-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      margin-bottom: 18px;
-    }
-
-    .customer-grid .wide {
-      grid-column: 1 / -1;
-    }
-
-    label {
       display: grid;
-      gap: 6px;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .form-label {
+      display: grid;
+      gap: 8px;
       color: var(--walnut-dark);
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 780;
+      letter-spacing: .01em;
     }
 
     input,
     select,
     textarea {
       width: 100%;
-      min-height: 48px;
-      max-width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--cream);
+      min-height: 54px;
+      border: 1px solid rgba(122, 86, 59, .18);
+      border-radius: 18px;
+      background: rgba(255, 250, 241, .82);
       color: var(--ink);
-      font-family: inherit;
-      font-size: 17px !important;
-      font-weight: 600;
-      line-height: 1.35;
-      padding: 10px 12px;
+      font-size: 16px;
+      font-weight: 650;
       outline: none;
-      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
-      -webkit-appearance: none;
-      appearance: none;
-      transform: translateZ(0);
-    }
-
-    select {
-      background-image:
-        linear-gradient(45deg, transparent 50%, var(--walnut) 50%),
-        linear-gradient(135deg, var(--walnut) 50%, transparent 50%);
-      background-position:
-        calc(100% - 18px) 50%,
-        calc(100% - 13px) 50%;
-      background-size: 5px 5px, 5px 5px;
-      background-repeat: no-repeat;
-      padding-right: 34px;
+      padding: 13px 15px;
+      transition: border-color .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
     }
 
     textarea {
-      min-height: 78px;
+      min-height: 92px;
       resize: vertical;
     }
 
     input:focus,
     select:focus,
     textarea:focus {
-      border-color: var(--walnut);
-      box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.16);
+      border-color: rgba(122, 86, 59, .54);
+      box-shadow: 0 0 0 4px rgba(122, 86, 59, .1);
       background: #fffdf8;
     }
 
     .shelves {
       display: grid;
-      gap: 12px;
+      gap: 14px;
     }
 
     .shelf-row {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255, 250, 242, 0.76);
-      padding: 14px;
+      display: grid;
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid rgba(122, 86, 59, .14);
+      border-radius: 24px;
+      background: rgba(255, 250, 241, .68);
     }
 
     .shelf-row-head {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
     }
 
     .shelf-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin: 0;
       color: var(--walnut-dark);
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 840;
+    }
+
+    .shelf-index {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--walnut-dark);
+      color: #fff8ec;
+      font-size: 13px;
+    }
+
+    .btn-remove {
+      min-height: 38px;
+      padding: 0 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(159, 63, 53, .2);
+      background: rgba(159, 63, 53, .06);
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 760;
     }
 
     .shelf-grid {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-
-    .shelf-grid .type {
-      grid-column: span 2;
+      display: grid;
+      gap: 12px;
     }
 
     .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
     }
 
-    button {
-      min-height: 44px;
-      border: 0;
-      border-radius: 8px;
-      cursor: pointer;
-      font: inherit;
-      font-size: 16px;
-      font-weight: 700;
-      padding: 11px 16px;
-      transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
-      touch-action: manipulation;
+    .summary-card {
+      position: sticky;
+      top: 94px;
+      background: rgba(255, 253, 248, .88);
+      backdrop-filter: blur(18px);
     }
 
-    button:hover {
-      transform: translateY(-1px);
-    }
-
-    button:disabled {
-      cursor: not-allowed;
-      opacity: 0.58;
-      transform: none;
-    }
-
-    .btn-primary {
-      flex: 1 1 180px;
-      background: var(--walnut);
-      color: var(--cream);
-      box-shadow: 0 12px 24px rgba(111, 78, 55, 0.22);
-    }
-
-    .btn-secondary {
-      background: #f4eadb;
-      color: var(--walnut-dark);
-      border: 1px solid var(--line);
-    }
-
-    .btn-danger {
-      min-height: 36px;
-      padding: 7px 10px;
-      background: transparent;
-      color: var(--danger);
-      border: 1px solid rgba(157, 59, 48, 0.34);
-      font-size: 13px;
-    }
-
-    .invoice-head {
+    .summary-head,
+    .summary-total,
+    .line-main {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
       align-items: baseline;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 12px;
-      margin-bottom: 12px;
     }
 
-    .invoice-title {
+    .summary-title,
+    .summary-total strong {
       margin: 0;
       color: var(--walnut-dark);
-      font-size: 18px;
+      font-size: 20px;
     }
 
-    .invoice-count {
+    .summary-count {
       color: var(--muted);
       font-size: 13px;
+      font-weight: 740;
     }
 
     .invoice-lines {
       display: grid;
-      gap: 10px;
-      min-height: 64px;
+      gap: 12px;
+      min-height: 68px;
+      margin: 20px 0;
     }
 
     .invoice-line {
-      display: grid;
-      gap: 5px;
-      padding: 10px 0;
-      border-bottom: 1px dashed var(--line);
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(122, 86, 59, .13);
     }
 
     .line-main {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--ink);
-      font-weight: 700;
+      color: var(--walnut-dark);
+      font-weight: 820;
     }
 
-    .line-meta {
+    .line-meta,
+    .line-note,
+    .empty {
       color: var(--muted);
       font-size: 13px;
     }
 
     .line-note {
-      color: var(--warn);
-      font-size: 13px;
-      font-weight: 700;
+      color: #9a6a21;
+      font-weight: 780;
     }
 
-    .invoice-total {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: baseline;
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 2px solid var(--walnut);
-      color: var(--walnut-dark);
-      font-weight: 700;
+    .summary-total {
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
     }
 
     .total-number {
-      font-size: 24px;
+      color: var(--walnut-dark);
+      font-size: 28px;
+      font-weight: 900;
     }
 
     .message {
       display: none;
       margin-top: 14px;
-      border-radius: 8px;
-      padding: 12px;
-      font-weight: 700;
+      border-radius: 18px;
+      padding: 13px 15px;
+      font-weight: 760;
     }
 
     .message.show {
@@ -351,208 +748,610 @@
     }
 
     .message.success {
-      background: rgba(49, 112, 91, 0.1);
+      background: rgba(65, 111, 90, .1);
       color: var(--ok);
-      border: 1px solid rgba(49, 112, 91, 0.22);
+      border: 1px solid rgba(65, 111, 90, .22);
     }
 
     .message.error {
-      background: rgba(157, 59, 48, 0.1);
+      background: rgba(159, 63, 53, .08);
       color: var(--danger);
-      border: 1px solid rgba(157, 59, 48, 0.22);
+      border: 1px solid rgba(159, 63, 53, .2);
     }
 
-    .empty {
+    .loading-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      width: fit-content;
       color: var(--muted);
-      font-size: 14px;
-      padding: 12px 0;
+      font-size: 13px;
+      font-weight: 740;
     }
 
-    .mobile-view .topbar {
-      display: block;
+    .loader {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(122, 86, 59, .22);
+      border-top-color: var(--walnut);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
     }
 
-    .mobile-view .layout {
-      grid-template-columns: 1fr;
-    }
-
-    .mobile-view .invoice {
-      position: static;
-    }
-
-    .mobile-view .customer-grid,
-    .mobile-view .shelf-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .mobile-view .shelf-grid .type {
-      grid-column: auto;
-    }
-
-    .mobile-view .shelf-row-head {
-      align-items: flex-start;
-    }
-
-    .mobile-view .line-main,
-    .mobile-view .invoice-total {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .mobile-view .page {
-      width: 100vw;
-      padding: 14px 10px 28px;
-    }
-
-    .mobile-view .brand {
-      font-size: 30px;
-    }
-
-    .mobile-view .tagline {
-      font-size: 14px;
-    }
-
-    .mobile-view .panel,
-    .mobile-view .invoice {
-      padding: 12px;
-      box-shadow: 0 10px 28px rgba(63, 45, 35, 0.1);
-    }
-
-    .mobile-view .section-title,
-    .mobile-view .invoice-title {
-      font-size: 20px;
-    }
-
-    .mobile-view label {
-      gap: 5px;
-      font-size: 15px;
-    }
-
-    .mobile-view input,
-    .mobile-view select,
-    .mobile-view textarea {
-      font-size: 17px !important;
-    }
-
-    .mobile-view .shelf-row {
-      padding: 12px;
-    }
-
-    .mobile-view .actions {
+    .reviews-grid {
       display: grid;
-      grid-template-columns: 1fr;
+      gap: 16px;
     }
 
-    .mobile-view .btn-primary,
-    .mobile-view .btn-secondary {
-      width: 100%;
+    .review-card {
+      padding: 22px;
     }
 
-    @media (max-width: 1024px), (hover: none) and (pointer: coarse) {
-      .topbar {
-        display: block;
-      }
+    .review-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
 
-      .layout {
-        grid-template-columns: 1fr;
-      }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--walnut), var(--sand));
+      color: #fffaf0;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
 
-      .invoice {
-        position: static;
+    .stars {
+      color: #b88745;
+      letter-spacing: .08em;
+      font-size: 13px;
+    }
+
+    .final-cta {
+      position: relative;
+      overflow: hidden;
+      min-height: 78svh;
+      display: grid;
+      place-items: end start;
+      padding: 100px 18px 54px;
+      color: #fffaf0;
+      isolation: isolate;
+    }
+
+    .final-cta::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(180deg, rgba(20, 15, 12, .12), rgba(20, 15, 12, .72)),
+        url("https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=2200&q=86") center/cover;
+    }
+
+    .final-cta .section-inner {
+      display: grid;
+      gap: 20px;
+    }
+
+    .final-cta h2 {
+      max-width: 820px;
+      margin: 0;
+      font-size: clamp(38px, 8vw, 78px);
+      line-height: 1;
+      text-wrap: balance;
+    }
+
+    .footer {
+      padding: 34px 18px 92px;
+      background: var(--walnut-dark);
+      color: rgba(255, 250, 241, .78);
+    }
+
+    .footer-inner {
+      width: min(var(--max), 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 14px;
+    }
+
+    .floating-cta {
+      position: fixed;
+      z-index: 50;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 10px 10px 16px;
+      border: 1px solid rgba(255, 255, 255, .5);
+      border-radius: 999px;
+      background: rgba(255, 253, 248, .88);
+      box-shadow: 0 18px 50px rgba(47, 36, 29, .18);
+      backdrop-filter: blur(18px);
+    }
+
+    .floating-meta {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .floating-total {
+      display: block;
+      overflow: hidden;
+      color: var(--walnut-dark);
+      font-size: 15px;
+      font-weight: 900;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .floating-cta .btn-primary {
+      min-height: 44px;
+      padding: 0 16px;
+    }
+
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .65s var(--ease), transform .65s var(--ease);
+    }
+
+    [data-reveal].visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes riseIn {
+      from {
+        opacity: 0;
+        transform: translateY(26px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
 
-    @media (max-width: 720px), (hover: none) and (pointer: coarse) {
-      .page {
-        padding: 20px 12px 32px;
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (min-width: 720px) {
+      .nav-links {
+        display: flex;
       }
 
-      .panel,
-      .invoice {
-        padding: 14px;
+      .hero {
+        padding-inline: 24px;
       }
 
-      .customer-grid,
+      .trust-inner {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .story-grid,
+      .reviews-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .solution-grid {
+        grid-template-columns: 1.05fr .95fr;
+      }
+
+      .solution-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .gallery-item:nth-child(1),
+      .gallery-item:nth-child(6) {
+        grid-column: span 2;
+      }
+
+      .gallery-item.tall {
+        grid-row: span 2;
+      }
+
+      .video-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .customer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .customer-grid .wide {
+        grid-column: 1 / -1;
+      }
+
       .shelf-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
       }
 
       .shelf-grid .type {
-        grid-column: auto;
+        grid-column: span 2;
       }
 
-      .shelf-row-head {
-        align-items: flex-start;
+      .actions {
+        grid-template-columns: auto 1fr;
       }
 
-      .btn-danger {
-        white-space: nowrap;
+      .footer-inner {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+    }
+
+    @media (min-width: 980px) {
+      .config-layout {
+        grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr);
       }
 
-      .line-main,
-      .invoice-total {
-        align-items: flex-start;
-        flex-direction: column;
+      .story-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .floating-cta {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
       }
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <header class="topbar">
-      <div>
-        <h1 class="brand">MISU Order App</h1>
-        <p class="tagline">Đặt kệ module theo kích thước và màu sắc mong muốn.</p>
+  <div class="site-shell">
+    <nav class="nav" aria-label="Điều hướng chính">
+      <div class="nav-inner">
+        <a class="brand-mark" href="#top" aria-label="MISU">
+          <span class="brand-symbol">M</span>
+          <span>MISU</span>
+        </a>
+        <div class="nav-links" aria-label="Liên kết nhanh">
+          <a href="#solution">Giải pháp</a>
+          <a href="#gallery">Không gian</a>
+          <a href="#configurator">Đặt kệ</a>
+        </div>
+        <a class="nav-cta" href="#configurator">Đặt kệ ngay</a>
+      </div>
+    </nav>
+
+    <header id="top" class="hero">
+      <div class="hero-media" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="eyebrow">Japandi module furniture</p>
+        <h1>MISU — Kệ module thông minh cho không gian sống hiện đại</h1>
+        <p class="hero-copy">Lắp ráp nhanh · Không khoan tường · Mở rộng linh hoạt</p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="#configurator">Đặt kệ ngay</a>
+          <a class="btn-secondary" href="#gallery">Xem không gian mẫu</a>
+        </div>
+        <p class="hero-note">Thiết kế tối giản cho căn hộ nhỏ, studio, góc làm việc và tổ ấm đang lớn dần.</p>
       </div>
     </header>
 
-    <div class="layout">
-      <section class="panel" aria-label="Thông tin đặt hàng">
-        <h2 class="section-title">Thông tin khách hàng</h2>
+    <section class="trust-bar" aria-label="Cam kết nhanh">
+      <div class="trust-inner">
+        <div class="trust-item"><span class="trust-icon">✓</span>Không khoan</div>
+        <div class="trust-item"><span class="trust-icon">✓</span>Lắp 20 phút</div>
+        <div class="trust-item"><span class="trust-icon">✓</span>Chịu lực tốt</div>
+        <div class="trust-item"><span class="trust-icon">✓</span>Ghép module linh hoạt</div>
+      </div>
+    </section>
 
-        <div class="customer-grid">
-          <label>
-            Họ tên
-            <input id="customerName" type="text" autocomplete="name" placeholder="Nguyễn Minh Anh">
-          </label>
+    <section class="section" id="problem">
+      <div class="section-inner">
+        <div class="section-head" data-reveal>
+          <p class="section-kicker">Không gian nhỏ, vấn đề thật</p>
+          <h2 class="section-title">Một chiếc kệ đẹp không nên khiến căn nhà trở nên nặng nề.</h2>
+          <p class="section-text">MISU được sinh ra cho những không gian cần gọn, đẹp, dễ thay đổi mà vẫn có cảm giác ấm áp như một studio sống thật.</p>
+        </div>
+        <div class="story-grid">
+          <article class="pain-card" data-index="01" data-reveal>
+            <h3>Nhà nhỏ khó setup</h3>
+            <p>Nội thất cồng kềnh làm lối đi bí, góc đẹp trở thành góc chứa đồ.</p>
+          </article>
+          <article class="pain-card" data-index="02" data-reveal>
+            <h3>Kệ yếu và xấu</h3>
+            <p>Kệ tạm bợ nhanh cong, màu sắc lạc tone với căn phòng.</p>
+          </article>
+          <article class="pain-card" data-index="03" data-reveal>
+            <h3>Chuyển nhà bất tiện</h3>
+            <p>Mua một lần nhưng mỗi lần đổi phòng lại phải bỏ hoặc mua lại.</p>
+          </article>
+          <article class="pain-card" data-index="04" data-reveal>
+            <h3>Không muốn khoan tường</h3>
+            <p>Nhà thuê, căn hộ mới hoặc studio đều cần giải pháp sạch hơn.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-          <label>
-            Số điện thoại
-            <input id="phone" type="tel" autocomplete="tel" placeholder="09xxxxxxxx">
-          </label>
+    <section class="section solution" id="solution">
+      <div class="section-inner">
+        <div class="section-head" data-reveal>
+          <p class="section-kicker">MISU module system</p>
+          <h2 class="section-title">Một hệ kệ có thể lớn lên cùng không gian của bạn.</h2>
+          <p class="section-text">Bắt đầu bằng một góc nhỏ, thêm module khi cần, đổi bố cục khi chuyển nhà. MISU giữ tinh thần tối giản nhưng không lạnh.</p>
+        </div>
+        <div class="solution-grid">
+          <figure class="solution-feature" data-reveal>
+            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1400&q=84" alt="Kệ gỗ phong cách tối giản trong không gian sống" loading="lazy">
+            <figcaption class="feature-caption">
+              <p>Setup nhanh cho phòng ngủ, workspace, phòng khách hoặc góc cafe tại nhà.</p>
+            </figcaption>
+          </figure>
+          <div class="solution-cards">
+            <article class="solution-card" data-reveal>
+              <div class="card-icon">□</div>
+              <h3>Module system</h3>
+              <p>Chọn chiều cao, rộng, sâu và màu để tạo cấu hình vừa với căn phòng.</p>
+            </article>
+            <article class="solution-card" data-reveal>
+              <div class="card-icon">↔</div>
+              <h3>Dễ mở rộng</h3>
+              <p>Thêm kệ khi cần nhiều lưu trữ hơn, không cần thay toàn bộ hệ.</p>
+            </article>
+            <article class="solution-card" data-reveal>
+              <div class="card-icon">✦</div>
+              <h3>Decor đẹp</h3>
+              <p>Tone walnut và gỗ vàng dễ phối với Japandi, Muji, Korean minimal.</p>
+            </article>
+            <article class="solution-card" data-reveal>
+              <div class="card-icon">20</div>
+              <h3>Setup nhanh</h3>
+              <p>Lắp gọn, sạch, không khoan tường, phù hợp cả nhà thuê.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
 
-          <label class="wide">
-            Địa chỉ giao hàng
-            <textarea id="address" autocomplete="street-address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"></textarea>
-          </label>
+    <section class="section" id="gallery">
+      <div class="section-inner">
+        <div class="section-head" data-reveal>
+          <p class="section-kicker">Lifestyle gallery</p>
+          <h2 class="section-title">Từ góc cafe đến workspace, MISU giữ mọi thứ ở đúng chỗ.</h2>
+        </div>
+        <div class="gallery-grid">
+          <figure class="gallery-item tall" data-reveal>
+            <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=900&q=82" alt="Phòng ngủ tối giản màu kem" loading="lazy">
+            <figcaption class="gallery-label">Phòng ngủ</figcaption>
+          </figure>
+          <figure class="gallery-item" data-reveal>
+            <img src="https://images.unsplash.com/photo-1600494603989-9650cf6ddd3d?auto=format&fit=crop&w=1000&q=82" alt="Workspace tối giản" loading="lazy">
+            <figcaption class="gallery-label">Workspace</figcaption>
+          </figure>
+          <figure class="gallery-item" data-reveal>
+            <img src="https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?auto=format&fit=crop&w=1000&q=82" alt="Phòng khách gỗ ấm" loading="lazy">
+            <figcaption class="gallery-label">Phòng khách</figcaption>
+          </figure>
+          <figure class="gallery-item tall" data-reveal>
+            <img src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=900&q=82" alt="Góc cafe tại nhà" loading="lazy">
+            <figcaption class="gallery-label">Góc cafe</figcaption>
+          </figure>
+          <figure class="gallery-item" data-reveal>
+            <img src="https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1000&q=82" alt="Bếp tối giản" loading="lazy">
+            <figcaption class="gallery-label">Bếp</figcaption>
+          </figure>
+          <figure class="gallery-item" data-reveal>
+            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1000&q=82" alt="Studio lifestyle hiện đại" loading="lazy">
+            <figcaption class="gallery-label">Studio</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="test">
+      <div class="section-inner">
+        <div class="section-head" data-reveal>
+          <p class="section-kicker">Test & setup</p>
+          <h2 class="section-title">Nhìn thấy cách MISU đứng vững, lắp nhanh và thay đổi căn phòng.</h2>
+        </div>
+        <div class="video-grid">
+          <article class="video-card" data-reveal>
+            <div class="video-frame">
+              <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=80" alt="Video placeholder test lực" loading="lazy">
+              <span class="play-button">▶</span>
+            </div>
+            <div class="video-body">
+              <h3>Video test lực</h3>
+              <p>Placeholder cho clip đặt sách, decor và tải trọng thực tế.</p>
+            </div>
+          </article>
+          <article class="video-card" data-reveal>
+            <div class="video-frame">
+              <img src="https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?auto=format&fit=crop&w=900&q=80" alt="Video placeholder lắp ráp" loading="lazy">
+              <span class="play-button">▶</span>
+            </div>
+            <div class="video-body">
+              <h3>Video lắp ráp</h3>
+              <p>Thay bằng clip 20 phút setup từ hộp đến hoàn thiện.</p>
+            </div>
+          </article>
+          <article class="video-card" data-reveal>
+            <div class="video-frame">
+              <img src="https://images.unsplash.com/photo-1617104678098-de229db51175?auto=format&fit=crop&w=900&q=80" alt="Before after setup phòng" loading="lazy">
+              <span class="play-button">▶</span>
+            </div>
+            <div class="video-body">
+              <h3>Before / After</h3>
+              <p>Không gian bừa bộn thành góc sống có gu và dễ dùng.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section configurator" id="configurator">
+      <div class="section-inner">
+        <div class="section-head" data-reveal>
+          <p class="section-kicker">Product configurator</p>
+          <h2 class="section-title">Thiết kế hệ kệ MISU của bạn.</h2>
+          <p class="section-text">Chọn kích thước, màu và số lượng. Bảng giá được lấy trực tiếp từ Google Sheet của MISU.</p>
+          <div id="priceLoading" class="loading-pill"><span class="loader"></span>Đang tải bảng giá mới nhất</div>
         </div>
 
-        <h2 class="section-title">Danh sách kệ</h2>
-        <div id="shelves" class="shelves"></div>
+        <div class="config-layout">
+          <section class="order-panel" aria-label="Thông tin đặt hàng" data-reveal>
+            <div class="customer-grid">
+              <label class="form-label">
+                Họ tên
+                <input id="customerName" type="text" autocomplete="name" placeholder="Nguyễn Minh Anh">
+              </label>
 
-        <div class="actions">
-          <button class="btn-secondary" type="button" onclick="addShelf()">+ Thêm kệ</button>
-          <button id="submitButton" class="btn-primary" type="button" onclick="submitOrder()">Gửi đơn</button>
+              <label class="form-label">
+                Số điện thoại
+                <input id="phone" type="tel" autocomplete="tel" placeholder="09xxxxxxxx">
+              </label>
+
+              <label class="form-label wide">
+                Địa chỉ giao hàng
+                <textarea id="address" autocomplete="street-address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"></textarea>
+              </label>
+            </div>
+
+            <div id="shelves" class="shelves"></div>
+
+            <div class="actions">
+              <button class="btn-secondary" type="button" onclick="addShelf()">+ Thêm module</button>
+              <button id="submitButton" class="btn-primary" type="button" onclick="submitOrder()">Đặt hàng ngay</button>
+            </div>
+
+            <div id="formMessage" class="message" role="status"></div>
+          </section>
+
+          <aside class="summary-card" aria-label="Tóm tắt đơn hàng" data-reveal>
+            <div class="summary-head">
+              <h2 class="summary-title">Tạm tính</h2>
+              <span id="invoiceCount" class="summary-count">0 module</span>
+            </div>
+
+            <div id="invoiceLines" class="invoice-lines"></div>
+
+            <div class="summary-total">
+              <strong>Tổng</strong>
+              <span id="invoiceTotal" class="total-number">0đ</span>
+            </div>
+          </aside>
         </div>
+      </div>
+    </section>
 
-        <div id="formMessage" class="message" role="status"></div>
-      </section>
-
-      <aside class="invoice" aria-label="Hóa đơn tạm tính">
-        <div class="invoice-head">
-          <h2 class="invoice-title">Hóa đơn tạm</h2>
-          <span id="invoiceCount" class="invoice-count">0 dòng</span>
+    <section class="section" id="reviews">
+      <div class="section-inner">
+        <div class="section-head" data-reveal>
+          <p class="section-kicker">Customer notes</p>
+          <h2 class="section-title">Những căn phòng nhỏ đang trở nên dễ sống hơn.</h2>
         </div>
-
-        <div id="invoiceLines" class="invoice-lines"></div>
-
-        <div class="invoice-total">
-          <span>Tổng tạm tính</span>
-          <span id="invoiceTotal" class="total-number">0đ</span>
+        <div class="reviews-grid">
+          <article class="review-card" data-reveal>
+            <div class="review-top">
+              <div class="avatar">A</div>
+              <div>
+                <h3>Anh Thư · Căn hộ 38m²</h3>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+            <p>“Mình thích nhất là kệ không cần khoan, chuyển vị trí rất nhẹ. Tone gỗ lên phòng nhìn ấm hơn hẳn.”</p>
+          </article>
+          <article class="review-card" data-reveal>
+            <div class="review-top">
+              <div class="avatar">M</div>
+              <div>
+                <h3>Minh Quân · Home studio</h3>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+            <p>“Setup góc làm việc gọn hơn, có thể thêm module khi đồ nhiều lên. Nhìn không bị cảm giác kệ kho.”</p>
+          </article>
+          <article class="review-card" data-reveal>
+            <div class="review-top">
+              <div class="avatar">L</div>
+              <div>
+                <h3>Linh Chi · Nhà thuê</h3>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+            <p>“Không khoan tường là điểm cộng lớn. Lắp nhanh, tháo ra cũng dễ khi chuyển nhà.”</p>
+          </article>
+          <article class="review-card" data-reveal>
+            <div class="review-top">
+              <div class="avatar">K</div>
+              <div>
+                <h3>Kai · Góc cafe</h3>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+            <p>“Mình dùng để bày ly, sách và máy pha cafe. Nhìn lên ảnh rất sạch và có gu.”</p>
+          </article>
         </div>
-      </aside>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="section-inner" data-reveal>
+        <p class="eyebrow">Start with one module</p>
+        <h2>Bắt đầu setup không gian sống của bạn</h2>
+        <a class="btn-primary" href="#configurator">Đặt hàng ngay</a>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <a class="brand-mark" href="#top">
+          <span class="brand-symbol">M</span>
+          <span>MISU</span>
+        </a>
+        <div class="footer-links">
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="#">Facebook</a>
+          <span>© 2026 MISU. All rights reserved.</span>
+        </div>
+      </div>
+    </footer>
+
+    <div class="floating-cta" aria-label="Đặt hàng nhanh">
+      <div class="floating-meta">
+        <span id="floatingCount">0 module</span>
+        <span id="floatingTotal" class="floating-total">0đ</span>
+      </div>
+      <a class="btn-primary" href="#configurator">Đặt ngay</a>
     </div>
-  </main>
+  </div>
 
   <script>
     const OPTIONS = {
@@ -566,6 +1365,7 @@
 
     let shelves = [];
     let priceTable = [];
+
     const LOCAL_API_BASE_URL = 'http://localhost:3002';
     const RENDER_API_BASE_URL = 'https://YOUR_RENDER_URL.onrender.com';
     const isLocalFrontend = ['localhost', '127.0.0.1'].includes(window.location.hostname) || window.location.protocol === 'file:';
@@ -579,31 +1379,24 @@
     const ORDER_API_URL = `${API_BASE_URL}/orders`;
 
     document.addEventListener('DOMContentLoaded', () => {
-      updateMobileView();
       addShelf();
       loadPriceTable();
+      initRevealAnimation();
     });
 
-    window.addEventListener('resize', updateMobileView);
-
-    function updateMobileView() {
-      const viewportWidth = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-      const screenWidth = Math.min(window.screen.width || viewportWidth, window.screen.height || viewportWidth);
-      const isTouchPhone = navigator.maxTouchPoints > 0 && screenWidth <= 768;
-      document.body.classList.toggle('mobile-view', viewportWidth <= 1024 || isTouchPhone);
-    }
-
     function loadPriceTable() {
-      // Lấy bảng giá từ Google Sheet để hóa đơn tạm cập nhật ngay khi khách chọn kệ.
+      setPriceLoading(true);
       fetch(PRICE_API_URL)
         .then(response => response.json())
         .then((data) => {
           priceTable = Array.isArray(data.priceTable) ? data.priceTable : [];
+          setPriceLoading(false);
           renderInvoice();
         })
         .catch((error) => {
           priceTable = buildPreviewPriceTable();
-          showMessage(error.message || 'Chưa tải được bảng giá.', 'error');
+          setPriceLoading(false);
+          showMessage(error.message || 'Chưa tải được bảng giá. MISU sẽ xác nhận lại giá khi nhận đơn.', 'error');
           renderInvoice();
         });
     }
@@ -624,7 +1417,7 @@
 
     function removeShelf(index) {
       if (shelves.length === 1) {
-        showMessage('Đơn hàng cần ít nhất một dòng kệ.', 'error');
+        showMessage('Đơn hàng cần ít nhất một module.', 'error');
         return;
       }
 
@@ -644,8 +1437,8 @@
       shelvesElement.innerHTML = shelves.map((shelf, index) => `
         <article class="shelf-row">
           <div class="shelf-row-head">
-            <p class="shelf-name">Kệ ${index + 1}</p>
-            <button class="btn-danger" type="button" onclick="removeShelf(${index})">Xóa dòng kệ</button>
+            <p class="shelf-name"><span class="shelf-index">${index + 1}</span>Module ${index + 1}</p>
+            <button class="btn-remove" type="button" onclick="removeShelf(${index})">Xóa</button>
           </div>
 
           <div class="shelf-grid">
@@ -662,7 +1455,7 @@
 
     function selectField(label, index, key, options, value, extraClass = '') {
       return `
-        <label class="${extraClass}">
+        <label class="form-label ${extraClass}">
           ${label}
           <select onchange="updateShelf(${index}, '${key}', this.value)">
             ${options.map(option => `
@@ -682,29 +1475,29 @@
     }
 
     function renderInvoice() {
-      // Nếu thiếu giá trong PRICE_TABLE, dòng đó vẫn được giữ lại và đánh dấu chờ xác nhận.
       const linesElement = document.getElementById('invoiceLines');
       const pricedShelves = shelves.map(getPricedShelf);
       const total = pricedShelves.reduce((sum, shelf) => sum + shelf.lineTotal, 0);
+      const countText = `${shelves.length} module`;
 
-      document.getElementById('invoiceCount').textContent = `${shelves.length} dòng`;
+      document.getElementById('invoiceCount').textContent = countText;
       document.getElementById('invoiceTotal').textContent = formatCurrency(total);
+      document.getElementById('floatingCount').textContent = countText;
+      document.getElementById('floatingTotal').textContent = formatCurrency(total);
 
       if (!pricedShelves.length) {
-        linesElement.innerHTML = '<div class="empty">Chưa có dòng kệ nào.</div>';
+        linesElement.innerHTML = '<div class="empty">Chưa có module nào.</div>';
         return;
       }
 
       linesElement.innerHTML = pricedShelves.map((shelf, index) => `
         <div class="invoice-line">
           <div class="line-main">
-            <span>Kệ ${index + 1} · ${shelf.quantity} bộ</span>
+            <span>Module ${index + 1} · ${shelf.quantity} bộ</span>
             <span>${shelf.needsConfirmation ? 'Chờ xác nhận' : formatCurrency(shelf.lineTotal)}</span>
           </div>
-          <div class="line-meta">
-            ${shelf.shelfType}, ${shelf.height}x${shelf.width}x${shelf.depth} cm, ${shelf.color}
-          </div>
-          ${shelf.needsConfirmation ? '<div class="line-note">Cần MISU xác nhận giá</div>' : `<div class="line-meta">${formatCurrency(shelf.unitPrice)} / bộ</div>`}
+          <div class="line-meta">${shelf.shelfType}, ${shelf.height}x${shelf.width}x${shelf.depth} cm, ${shelf.color}</div>
+          ${shelf.needsConfirmation ? '<div class="line-note">MISU sẽ xác nhận giá cho cấu hình này</div>' : `<div class="line-meta">${formatCurrency(shelf.unitPrice)} / bộ</div>`}
         </div>
       `).join('');
     }
@@ -756,7 +1549,6 @@
     }
 
     function submitOrder() {
-      // Gửi toàn bộ thông tin khách hàng và danh sách kệ về Apps Script để lưu đơn.
       const orderData = {
         customerName: document.getElementById('customerName').value.trim(),
         phone: document.getElementById('phone').value.trim(),
@@ -782,11 +1574,11 @@
         .then(response => response.json())
         .then((result) => {
           if (!result.success) {
-            throw new Error(result.message || 'Chưa gửi được đơn. Vui lòng thử lại.');
+            throw new Error(result.message || result.error || 'Chưa gửi được đơn. Vui lòng thử lại.');
           }
 
           setSubmitting(false);
-          showMessage(`Cảm ơn bạn. MISU đã nhận đơn ${result.orderCode}.`, 'success');
+          showMessage(`MISU đã nhận đơn ${result.orderCode}. Tụi mình sẽ liên hệ xác nhận sớm.`, 'success');
           resetForm();
         })
         .catch((error) => {
@@ -806,7 +1598,12 @@
     function setSubmitting(isSubmitting) {
       const button = document.getElementById('submitButton');
       button.disabled = isSubmitting;
-      button.textContent = isSubmitting ? 'Đang gửi...' : 'Gửi đơn';
+      button.innerHTML = isSubmitting ? '<span class="loader"></span>Đang gửi' : 'Đặt hàng ngay';
+    }
+
+    function setPriceLoading(isLoading) {
+      const loading = document.getElementById('priceLoading');
+      loading.style.display = isLoading ? 'inline-flex' : 'none';
     }
 
     function showMessage(text, type) {
@@ -821,6 +1618,26 @@
         currency: 'VND',
         maximumFractionDigits: 0,
       }).format(value || 0);
+    }
+
+    function initRevealAnimation() {
+      const elements = document.querySelectorAll('[data-reveal]');
+
+      if (!('IntersectionObserver' in window)) {
+        elements.forEach(element => element.classList.add('visible'));
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      elements.forEach(element => observer.observe(element));
     }
   </script>
 </body>
