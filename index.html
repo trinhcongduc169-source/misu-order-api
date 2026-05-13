@@ -381,65 +381,16 @@
     }
 
     .size-visual {
-      position: relative;
-      min-height: 210px;
-      display: grid;
-      place-items: center;
-      border-radius: 20px;
-      background:
-        linear-gradient(90deg, rgba(107, 78, 55, .08) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(107, 78, 55, .08) 1px, transparent 1px),
-        rgba(251, 246, 237, .68);
-      background-size: 28px 28px;
       overflow: hidden;
+      border-radius: 22px;
+      background: rgba(251, 246, 237, .68);
     }
 
-    .shelf-wireframe {
-      width: min(210px, 68vw);
-      aspect-ratio: 1 / 1.18;
-      display: grid;
-      grid-template-rows: repeat(4, 1fr);
-      border: 2px solid var(--walnut-dark);
-      border-radius: 10px;
-      transform: perspective(420px) rotateY(-12deg);
-      box-shadow: 18px 14px 0 rgba(122, 86, 59, .12);
-    }
-
-    .shelf-wireframe span {
-      border-bottom: 2px solid var(--walnut-dark);
-    }
-
-    .shelf-wireframe span:last-child {
-      border-bottom: 0;
-    }
-
-    .dimension-label {
-      position: absolute;
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: var(--paper);
-      border: 1px solid var(--line);
-      color: var(--walnut-dark);
-      font-size: 12px;
-      font-weight: 800;
-      box-shadow: 0 8px 22px rgba(43, 33, 26, .08);
-    }
-
-    .dimension-height {
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%) rotate(-90deg);
-    }
-
-    .dimension-width {
-      left: 50%;
-      bottom: 12px;
-      transform: translateX(-50%);
-    }
-
-    .dimension-depth {
-      right: 12px;
-      top: 34px;
+    .size-visual img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
     }
 
     .size-notes {
@@ -1046,10 +997,7 @@
               <section class="size-guide" aria-label="Minh hoa kich thuoc ke">
                 <h3>K&#237;ch th&#432;&#7899;c k&#7879;</h3>
                 <div class="size-visual">
-                  <div class="shelf-wireframe" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-                  <span class="dimension-label dimension-height">Chi&#7873;u cao</span>
-                  <span class="dimension-label dimension-width">Chi&#7873;u r&#7897;ng</span>
-                  <span class="dimension-label dimension-depth">Chi&#7873;u s&#226;u</span>
+                  <img src="images/misu-size.jpg.png" alt="B&#7843;ng minh h&#7885;a k&#237;ch th&#432;&#7899;c k&#7879; MISU" loading="lazy">
                 </div>
                 <ul class="size-notes">
                   <li><strong>Chi&#7873;u cao:</strong> ch&#7885;n theo m&#7851;u</li>
