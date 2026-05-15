@@ -1559,17 +1559,17 @@
     .misu-chat-chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      padding: 0 14px 12px;
+      gap: 5px;
+      padding: 0 14px 10px;
       flex-shrink: 0;
     }
     .misu-chat-chip {
-      padding: 5px 12px;
+      padding: 4px 10px;
       min-height: unset;
       background: #f0e8df;
       border: 1px solid #d6c4b2;
-      border-radius: 20px;
-      font-size: .78rem;
+      border-radius: 14px;
+      font-size: .74rem;
       color: #6b4c30;
       cursor: pointer;
       font-family: inherit;
@@ -1577,6 +1577,34 @@
       transition: background .15s;
     }
     .misu-chat-chip:hover { background: #e3d0bc; }
+
+    .misu-chat-more-toggle {
+      padding: 4px 10px;
+      min-height: unset;
+      background: transparent;
+      border: 1px dashed #c8a882;
+      border-radius: 14px;
+      font-size: .72rem;
+      color: #9a7355;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: background .15s, color .15s;
+    }
+    .misu-chat-more-toggle:hover { background: #f5ede4; color: #6b4c30; }
+
+    .misu-chat-extra-chips {
+      display: none;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 0 14px 8px;
+      flex-shrink: 0;
+    }
+    .misu-chat-extra-chips.open { display: flex; }
+    .misu-chat-extra-chips .misu-chat-chip {
+      font-size: .72rem;
+      padding: 3px 9px;
+    }
 
     /* ── Input area ──────────────────────────────────────────────── */
     .misu-chat-input-row {
@@ -1659,10 +1687,17 @@
 
     <div class="misu-chat-chips">
       <button class="misu-chat-chip">Kệ cho nhà bếp</button>
-      <button class="misu-chat-chip">Kệ cho phòng khách</button>
       <button class="misu-chat-chip">Kích thước có gì?</button>
-      <button class="misu-chat-chip">Kệ độc lập và module nối khác gì nhau?</button>
       <button class="misu-chat-chip">Tôi chưa biết chọn kệ nào</button>
+      <button class="misu-chat-more-toggle" id="misuMoreToggle">+ Gợi ý thêm</button>
+    </div>
+
+    <div class="misu-chat-extra-chips" id="misuExtraChips">
+      <button class="misu-chat-chip">Kệ cho phòng khách</button>
+      <button class="misu-chat-chip">Kệ độc lập là gì?</button>
+      <button class="misu-chat-chip">Module nối là gì?</button>
+      <button class="misu-chat-chip">Giá bao nhiêu?</button>
+      <button class="misu-chat-chip">Kệ có chắc không?</button>
     </div>
 
     <div class="misu-chat-input-row">
@@ -1881,6 +1916,14 @@
         if (!isOpen) openChat();
         send(chip.textContent.trim());
       });
+    });
+
+    /* ── More toggle ────────────────────────────────────────────── */
+    var moreToggle  = document.getElementById('misuMoreToggle');
+    var extraChips  = document.getElementById('misuExtraChips');
+    moreToggle.addEventListener('click', function () {
+      var expanded = extraChips.classList.toggle('open');
+      moreToggle.textContent = expanded ? 'Ẩn bớt' : '+ Gợi ý thêm';
     });
 
     /* ── Input events ───────────────────────────────────────────── */
