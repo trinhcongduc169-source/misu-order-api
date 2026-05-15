@@ -1332,5 +1332,575 @@
       }).format(value || 0);
     }
   </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       MISU Chat Widget
+       Đổi MISU_BOT_API_URL sau khi deploy bot lên Render
+  ══════════════════════════════════════════════════════════════════ -->
+  <style>
+    /* ── Toggle button ───────────────────────────────────────────── */
+    .misu-chat-toggle {
+      position: fixed;
+      right: 20px;
+      bottom: 90px;       /* trên mobile-cta bar (bottom 12px + ~62px cao) */
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 20px;
+      height: 52px;
+      min-height: unset;  /* override global input/textarea min-height */
+      background: #2b211a;
+      color: #fffdf8;
+      border: none;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 8px 28px rgba(43,33,26,.30);
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .misu-chat-toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 34px rgba(43,33,26,.38);
+      background: #3d2f26;
+    }
+    .misu-chat-toggle:active { transform: scale(0.97); }
+
+    .misu-unread-dot {
+      position: absolute;
+      top: 7px; right: 7px;
+      width: 10px; height: 10px;
+      background: #d94f3a;
+      border-radius: 50%;
+      border: 2px solid #2b211a;
+      display: none;
+    }
+    .misu-chat-toggle.misu-has-unread .misu-unread-dot { display: block; }
+
+    @media (min-width: 980px) {
+      .misu-chat-toggle { bottom: 32px; }
+    }
+
+    /* ── Popup ───────────────────────────────────────────────────── */
+    .misu-chat-popup {
+      position: fixed;
+      right: 20px;
+      bottom: 158px;
+      width: calc(100vw - 40px);
+      max-width: 375px;
+      max-height: 530px;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 56px rgba(43,33,26,.22), 0 2px 8px rgba(43,33,26,.08);
+      z-index: 1000;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(14px) scale(0.97);
+      pointer-events: none;
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .misu-chat-popup.misu-open {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+    @media (min-width: 980px) {
+      .misu-chat-popup { right: 32px; bottom: 100px; width: 370px; }
+    }
+
+    /* ── Header ──────────────────────────────────────────────────── */
+    .misu-chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      background: #2b211a;
+      flex-shrink: 0;
+    }
+    .misu-chat-header-info { display: flex; align-items: center; gap: 10px; }
+    .misu-chat-avatar {
+      width: 36px; height: 36px;
+      display: grid; place-items: center;
+      background: rgba(255,253,248,.14);
+      border-radius: 50%;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .misu-chat-name  { font-size: .92rem; font-weight: 760; color: #fffdf8; line-height: 1.2; }
+    .misu-chat-status { font-size: .73rem; color: rgba(255,253,248,.6); line-height: 1.2; margin-top: 1px; }
+    .misu-status-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      background: #7bc67e;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+    .misu-chat-close-btn {
+      width: 30px; height: 30px; min-height: unset;
+      background: rgba(255,253,248,.1);
+      border: none;
+      border-radius: 50%;
+      color: #fffdf8;
+      font-size: .85rem;
+      font-family: inherit;
+      cursor: pointer;
+      display: grid; place-items: center;
+      padding: 0; flex-shrink: 0;
+      transition: background .15s;
+    }
+    .misu-chat-close-btn:hover { background: rgba(255,253,248,.22); }
+
+    /* ── Messages ────────────────────────────────────────────────── */
+    .misu-chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      min-height: 0;
+    }
+    .misu-chat-message {
+      max-width: 83%;
+      padding: 9px 13px;
+      border-radius: 14px;
+      font-size: .875rem;
+      line-height: 1.58;
+      word-break: break-word;
+      animation: misuFadeUp .18s ease;
+    }
+    @keyframes misuFadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .misu-chat-message.misu-bot {
+      background: #f0e8df;
+      color: #3b2a1a;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    /* Override global: a { color: inherit; text-decoration: none } */
+    .misu-chat-message.misu-bot a {
+      color: #7a4f2e !important;
+      text-decoration: underline !important;
+      text-underline-offset: 2px;
+      word-break: break-all;
+    }
+    .misu-chat-message.misu-bot a:hover { color: #5a3520 !important; }
+    .misu-chat-message.misu-user {
+      background: #2b211a;
+      color: #fffdf8;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .misu-chat-message.misu-err {
+      background: #fde8e8;
+      color: #c0392b;
+      align-self: center;
+      font-size: .78rem;
+      border-radius: 10px;
+      max-width: 92%;
+    }
+
+    /* CTA – cuộn tới form, không mở tab mới */
+    .misu-chat-cta {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 18px;
+      min-height: unset;
+      background: #a0714f;
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 700;
+      font-family: inherit;
+      border-radius: 10px;
+      border: none;
+      margin-top: -3px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(100,60,20,.20);
+      transition: background .18s, transform .1s;
+    }
+    .misu-chat-cta:hover { background: #8a5f40; }
+    .misu-chat-cta:active { transform: scale(0.97); }
+
+    /* Typing dots */
+    .misu-chat-typing {
+      align-self: flex-start;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 11px 14px;
+      background: #f0e8df;
+      border-radius: 14px;
+      border-bottom-left-radius: 4px;
+    }
+    .misu-tdot {
+      width: 6px; height: 6px;
+      background: #9e8878;
+      border-radius: 50%;
+      animation: misuBounce 1.1s ease-in-out infinite;
+    }
+    .misu-tdot:nth-child(2) { animation-delay: .18s; }
+    .misu-tdot:nth-child(3) { animation-delay: .36s; }
+    @keyframes misuBounce {
+      0%,80%,100% { transform: translateY(0); opacity: .4; }
+      40%         { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ── Quick chips ─────────────────────────────────────────────── */
+    .misu-chat-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 14px 12px;
+      flex-shrink: 0;
+    }
+    .misu-chat-chip {
+      padding: 5px 12px;
+      min-height: unset;
+      background: #f0e8df;
+      border: 1px solid #d6c4b2;
+      border-radius: 20px;
+      font-size: .78rem;
+      color: #6b4c30;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: background .15s;
+    }
+    .misu-chat-chip:hover { background: #e3d0bc; }
+
+    /* ── Input area ──────────────────────────────────────────────── */
+    .misu-chat-input-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 10px 14px;
+      border-top: 1px solid #ede5dc;
+      flex-shrink: 0;
+    }
+    /* Override: textarea { min-height:86px; resize:vertical } */
+    .misu-chat-input {
+      flex: 1;
+      width: auto !important;
+      min-height: 38px !important;
+      max-height: 100px;
+      padding: 8px 13px !important;
+      border: 1.5px solid #d6c4b2 !important;
+      border-radius: 20px !important;
+      font-size: .88rem !important;
+      font-family: inherit;
+      outline: none !important;
+      resize: none !important;
+      overflow: hidden;
+      background: #faf7f4 !important;
+      color: #3b2a1a !important;
+      box-shadow: none !important;
+      transition: border-color .2s !important;
+    }
+    .misu-chat-input:focus {
+      border-color: #a0714f !important;
+      box-shadow: 0 0 0 3px rgba(160,113,79,.12) !important;
+      background: #fffdf8 !important;
+    }
+    .misu-chat-send {
+      width: 38px; height: 38px; min-height: unset;
+      flex-shrink: 0;
+      background: #2b211a;
+      color: #fffdf8;
+      border: none;
+      border-radius: 50%;
+      font-size: 1rem;
+      display: grid; place-items: center;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 0;
+      transition: background .18s, transform .1s;
+    }
+    .misu-chat-send:hover  { background: #3d2f26; }
+    .misu-chat-send:active { transform: scale(0.93); }
+    .misu-chat-send:disabled { background: #c8bfb5; cursor: not-allowed; }
+  </style>
+
+  <!-- Toggle button -->
+  <button class="misu-chat-toggle" id="misuChatToggle"
+          aria-label="Chat với MISU" aria-expanded="false">
+    <span>💬</span>
+    <span>Chat với MISU</span>
+    <span class="misu-unread-dot" aria-hidden="true"></span>
+  </button>
+
+  <!-- Chat popup -->
+  <div class="misu-chat-popup" id="misuChatPopup"
+       role="dialog" aria-label="MISU Bot" aria-hidden="true">
+
+    <div class="misu-chat-header">
+      <div class="misu-chat-header-info">
+        <span class="misu-chat-avatar">🪵</span>
+        <div>
+          <div class="misu-chat-name">MISU Bot</div>
+          <div class="misu-chat-status">
+            <span class="misu-status-dot"></span>Tư vấn kệ module thông minh
+          </div>
+        </div>
+      </div>
+      <button class="misu-chat-close-btn" id="misuChatClose" aria-label="Đóng chat">✕</button>
+    </div>
+
+    <div class="misu-chat-messages" id="misuChatMessages"></div>
+
+    <div class="misu-chat-chips">
+      <button class="misu-chat-chip">Kệ cho nhà bếp</button>
+      <button class="misu-chat-chip">Kệ cho phòng khách</button>
+      <button class="misu-chat-chip">Kích thước có gì?</button>
+      <button class="misu-chat-chip">Kệ độc lập và module nối khác gì nhau?</button>
+      <button class="misu-chat-chip">Tôi chưa biết chọn kệ nào</button>
+    </div>
+
+    <div class="misu-chat-input-row">
+      <textarea class="misu-chat-input" id="misuChatInput"
+        placeholder="Nhắn tin hỏi MISU..." rows="1" aria-label="Nhắn tin"></textarea>
+      <button class="misu-chat-send" id="misuChatSend" aria-label="Gửi">➤</button>
+    </div>
+
+  </div>
+
+  <script>
+  (function () {
+    /* ── Config ─────────────────────────────────────────────────────
+       Đổi thành URL Render sau khi deploy bot:
+       var MISU_BOT_API_URL = 'https://your-bot.onrender.com';
+    ────────────────────────────────────────────────────────────────── */
+    var MISU_BOT_API_URL = 'https://misu-bot.onrender.com';
+    var ORDER_DOMAIN     = 'misu-order-api.onrender.com';
+
+    /* ── State ──────────────────────────────────────────────────── */
+    var chatHistory  = [];
+    var isLoading    = false;
+    var isOpen       = false;
+    var orderFormUrl = '';
+
+    /* ── Elements ───────────────────────────────────────────────── */
+    var toggleBtn = document.getElementById('misuChatToggle');
+    var popup     = document.getElementById('misuChatPopup');
+    var closeBtn  = document.getElementById('misuChatClose');
+    var msgArea   = document.getElementById('misuChatMessages');
+    var textarea  = document.getElementById('misuChatInput');
+    var sendBtn   = document.getElementById('misuChatSend');
+
+    /* ── Scroll to order form (không mở tab mới) ────────────────── */
+    function scrollToOrderForm() {
+      var section = document.getElementById('order');
+      if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(function () {
+        var nameEl  = document.getElementById('customerName');
+        var phoneEl = document.getElementById('phone');
+        if (nameEl)       nameEl.focus();
+        else if (phoneEl) phoneEl.focus();
+      }, 620);
+    }
+
+    /* ── Open / Close ───────────────────────────────────────────── */
+    toggleBtn.addEventListener('click', function () { isOpen ? closeChat() : openChat(); });
+    closeBtn.addEventListener('click', closeChat);
+
+    document.addEventListener('click', function (e) {
+      if (isOpen && !popup.contains(e.target) && !toggleBtn.contains(e.target)) closeChat();
+    });
+
+    function openChat() {
+      isOpen = true;
+      popup.classList.add('misu-open');
+      popup.setAttribute('aria-hidden', 'false');
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      toggleBtn.classList.remove('misu-has-unread');
+      setTimeout(function () { textarea.focus(); }, 50);
+      scrollDown();
+    }
+
+    function closeChat() {
+      isOpen = false;
+      popup.classList.remove('misu-open');
+      popup.setAttribute('aria-hidden', 'true');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    /* ── Health check ───────────────────────────────────────────── */
+    function checkHealth() {
+      fetch(MISU_BOT_API_URL + '/health')
+        .then(function (r) { return r.json(); })
+        .then(function (d) { orderFormUrl = d.orderFormUrl || ''; })
+        .catch(function () {});
+    }
+
+    /* ── URL helpers ────────────────────────────────────────────── */
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function normalizeUrl(url) {
+      if (!url) return url;
+      url = url.replace(/[\]\[\(\)\.,;'"<>]+$/, '');
+      if (url.includes(ORDER_DOMAIN)) return 'https://' + ORDER_DOMAIN + '/';
+      return url;
+    }
+
+    function renderMd(raw) {
+      // Bóc markdown link [text](url) và (url) thành URL thuần
+      var processed = raw
+        .replace(/\[([^\]]*)\]\((https?:\/\/[^\)]+)\)/g, '$2')
+        .replace(/\((https?:\/\/[^\s\)]+)\)/g, '$1');
+      // Regex dừng tại ngoặc để không bắt nhầm
+      return processed.split(/(https?:\/\/[^\s\]\[\(\)'"<>]+)/).map(function (part) {
+        if (/^https?:\/\//.test(part)) {
+          var clean = normalizeUrl(part);
+          var safe  = escHtml(clean);
+          return '<a href="' + safe + '" target="_blank" rel="noopener noreferrer">' + safe + '</a>';
+        }
+        return escHtml(part)
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+          .replace(/\n/g, '<br>');
+      }).join('');
+    }
+
+    // Trả về URL sạch nếu reply có link đặt hàng, null nếu không
+    function detectOrderUrl(text) {
+      var mdMatch = text.match(/\[.*?\]\((https?:\/\/[^\)]+)\)/);
+      if (mdMatch) {
+        var u = normalizeUrl(mdMatch[1]);
+        if (u.includes(ORDER_DOMAIN)) return u;
+      }
+      var matches = text.match(/https?:\/\/[^\s]+/g) || [];
+      for (var i = 0; i < matches.length; i++) {
+        var clean = normalizeUrl(matches[i]);
+        if (clean.includes(ORDER_DOMAIN)) return clean;
+        if (orderFormUrl && clean.includes(orderFormUrl)) return clean;
+      }
+      if (orderFormUrl && text.includes(orderFormUrl)) return orderFormUrl;
+      return null;
+    }
+
+    /* ── Append message ─────────────────────────────────────────── */
+    function appendMsg(role, rawText) {
+      var div = document.createElement('div');
+      div.className = 'misu-chat-message misu-' + role;
+      div.innerHTML = renderMd(rawText);
+      msgArea.appendChild(div);
+
+      if (role === 'bot') {
+        // Phát hiện link form đặt hàng → hiện nút cuộn, KHÔNG mở tab mới
+        if (detectOrderUrl(rawText)) {
+          var btn = document.createElement('button');
+          btn.className = 'misu-chat-cta';
+          btn.innerHTML = '📝 Điền form đặt hàng';
+          btn.addEventListener('click', function () {
+            closeChat();
+            scrollToOrderForm();
+          });
+          msgArea.appendChild(btn);
+        }
+        if (!isOpen) toggleBtn.classList.add('misu-has-unread');
+      }
+
+      scrollDown();
+    }
+
+    function scrollDown() {
+      requestAnimationFrame(function () { msgArea.scrollTop = msgArea.scrollHeight; });
+    }
+
+    /* ── Typing indicator ───────────────────────────────────────── */
+    function showTyping() {
+      var el = document.createElement('div');
+      el.className = 'misu-chat-typing';
+      el.id = 'misuTyping';
+      el.innerHTML = '<span class="misu-tdot"></span><span class="misu-tdot"></span><span class="misu-tdot"></span>';
+      msgArea.appendChild(el);
+      scrollDown();
+    }
+    function removeTyping() {
+      var el = document.getElementById('misuTyping');
+      if (el) el.remove();
+    }
+
+    /* ── Send ───────────────────────────────────────────────────── */
+    function send(override) {
+      var text = override || textarea.value.trim();
+      if (!text || isLoading) return;
+
+      textarea.value = '';
+      textarea.style.height = 'auto';
+      isLoading = true;
+      sendBtn.disabled = true;
+
+      appendMsg('user', text);
+      chatHistory.push({ role: 'user', content: text });
+      showTyping();
+
+      fetch(MISU_BOT_API_URL + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: chatHistory.slice(-10) })
+      })
+      .then(function (res) {
+        removeTyping();
+        if (!res.ok) {
+          return res.json().catch(function () { return {}; }).then(function (d) {
+            appendMsg('err', '⚠️ ' + (d.error || 'Có lỗi xảy ra.'));
+          });
+        }
+        return res.json().then(function (d) {
+          var reply = d.reply || 'Dạ anh/chị có thể nói rõ hơn không ạ?';
+          appendMsg('bot', reply);
+          chatHistory.push({ role: 'assistant', content: reply });
+        });
+      })
+      .catch(function () {
+        removeTyping();
+        appendMsg('err', '⚠️ Không kết nối được bot. Kiểm tra npm start tại ' + MISU_BOT_API_URL);
+      })
+      .finally(function () {
+        isLoading = false;
+        sendBtn.disabled = false;
+        textarea.focus();
+      });
+    }
+
+    /* ── Quick chips ────────────────────────────────────────────── */
+    document.querySelectorAll('.misu-chat-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        if (!isOpen) openChat();
+        send(chip.textContent.trim());
+      });
+    });
+
+    /* ── Input events ───────────────────────────────────────────── */
+    sendBtn.addEventListener('click', function () { send(); });
+
+    textarea.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    });
+
+    textarea.addEventListener('input', function () {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
+    });
+
+    /* ── Init ───────────────────────────────────────────────────── */
+    checkHealth();
+    appendMsg('bot', 'Xin chào anh/chị! Em là nhân viên tư vấn của **MISU** 😊\n\nAnh/chị đang cần kệ cho không gian nào – bếp, phòng khách, phòng ngủ hay góc làm việc ạ?');
+
+  }());
+  </script>
+
 </body>
 </html>
