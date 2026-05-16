@@ -1656,6 +1656,39 @@
     .misu-chat-send:hover  { background: #3d2f26; }
     .misu-chat-send:active { transform: scale(0.93); }
     .misu-chat-send:disabled { background: #c8bfb5; cursor: not-allowed; }
+
+    /* ── Ảnh thực tế trong chat ─────────────────────────────────── */
+    .misu-chat-image-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-top: 4px;
+    }
+    .misu-chat-image-card {
+      display: block;
+      border-radius: 10px;
+      overflow: hidden;
+      text-decoration: none;
+      background: #f0ebe4;
+      transition: opacity 0.15s;
+    }
+    .misu-chat-image-card:hover { opacity: 0.88; }
+    .misu-chat-image-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+    }
+    .misu-chat-image-caption {
+      font-size: 0.69rem;
+      color: #6b5e52;
+      padding: 4px 7px 6px;
+      line-height: 1.3;
+    }
+    @media (max-width: 360px) {
+      .misu-chat-image-grid { grid-template-columns: 1fr; }
+      .misu-chat-image-card img { height: 160px; }
+    }
   </style>
 
   <!-- Toggle button -->
@@ -1895,8 +1928,18 @@
         }
         return res.json().then(function (d) {
           var reply = d.reply || 'Dạ anh/chị có thể nói rõ hơn không ạ?';
+          // Nếu bot nói không gửi được ảnh, thay bằng câu dẫn vào grid
+          if (/không thể gửi (hình|ảnh)|không gửi được (hình|ảnh)/i.test(reply)) {
+            reply = 'Dạ em gửi anh/chị một vài hình mẫu kệ thực tế để dễ hình dung hơn ạ.';
+          }
           appendMsg('bot', reply);
           chatHistory.push({ role: 'assistant', content: reply });
+          // Hiện ảnh nếu khách hỏi hình thực tế
+          var imgGroup = detectImageRequest(text);
+          if (imgGroup) {
+            var imgs = MISU_REAL_SHELF_IMAGES[imgGroup] || [];
+            if (imgs.length) appendImageGrid(imgs);
+          }
         });
       })
       .catch(function () {
@@ -1937,6 +1980,103 @@
       textarea.style.height = 'auto';
       textarea.style.height = Math.min(textarea.scrollHeight, 100) + 'px';
     });
+
+    /* ── Ảnh thực tế kệ MISU ───────────────────────────────────── */
+    var MISU_REAL_SHELF_IMAGES = {
+      kitchen: [
+        { url: '/images/anh-thuc-te-ke/ke-bep-misu-1.jpg.png',  caption: 'Mẫu kệ MISU cho khu bếp' },
+        { url: '/images/anh-thuc-te-ke/ke-bep-misu-4.jpg.png',  caption: 'Kệ bếp gọn để gia vị, ly tách, đồ khô' },
+        { url: '/images/anh-thuc-te-ke/ke-bep-misu-5.jpg.png',  caption: 'Kệ module cho không gian bếp' },
+        { url: '/images/anh-thuc-te-ke/ke-bep-misu-7.jpg.png',  caption: 'Kệ bếp MISU nhìn gọn nhưng chắc chắn' },
+        { url: '/images/anh-thuc-te-ke/ke-bep-misu-9.jpg.png',  caption: 'Mẫu kệ bếp thực tế' }
+      ],
+      living: [
+        { url: '/images/anh-thuc-te-ke/ke-phong-khach-1.jpg.png', caption: 'Mẫu kệ decor phòng khách' },
+        { url: '/images/anh-thuc-te-ke/ke-phong-khach-2.jpg.png', caption: 'Kệ module cho không gian phòng khách' },
+        { url: '/images/anh-thuc-te-ke/ke-phong-khach-3.jpg.png', caption: 'Kệ phòng khách phong cách gọn đẹp' },
+        { url: '/images/anh-thuc-te-ke/ke-phong-khach-4.jpg.png', caption: 'Mẫu kệ trưng bày phòng khách' }
+      ],
+      workspace: [
+        { url: '/images/anh-thuc-te-ke/ke-goc-lam-viec-1.jpg.png', caption: 'Mẫu kệ cho góc làm việc' },
+        { url: '/images/anh-thuc-te-ke/ke-goc-lam-viec-2.jpg.png', caption: 'Kệ gọn cho sách, hồ sơ và decor' },
+        { url: '/images/anh-thuc-te-ke/ke-goc-lam-viec-3.jpg.png', caption: 'Kệ module cho góc làm việc' }
+      ],
+      bedroom: [
+        { url: '/images/anh-thuc-te-ke/ke-phong-ngu-1.jpg.png', caption: 'Mẫu kệ cho phòng ngủ' },
+        { url: '/images/anh-thuc-te-ke/ke-phong-ngu-2.jpg.png', caption: 'Kệ gọn cho đồ cá nhân và decor' },
+        { url: '/images/anh-thuc-te-ke/ke-phong-ngu-3.jpg.png', caption: 'Kệ module cho không gian phòng ngủ' },
+        { url: '/images/anh-thuc-te-ke/ke-phong-ngu-4.jpg.png', caption: 'Kệ phòng ngủ nhìn ấm và gọn' }
+      ],
+      cafe: [
+        { url: '/images/anh-thuc-te-ke/ke-goc-cafe-1.jpg.png', caption: 'Mẫu kệ cho góc cafe nhỏ' }
+      ],
+      reading: [
+        { url: '/images/anh-thuc-te-ke/ke-goc-doc-sach-1.jpg.png', caption: 'Mẫu kệ cho góc đọc sách' },
+        { url: '/images/anh-thuc-te-ke/ke-goc-doc-sach-2.jpg.png', caption: 'Kệ gọn cho sách và decor' }
+      ],
+      sofa: [
+        { url: '/images/anh-thuc-te-ke/ke-tab-sofa-1.jpg.png', caption: 'Mẫu kệ cạnh sofa' },
+        { url: '/images/anh-thuc-te-ke/ke-tab-sofa-2.jpg.png', caption: 'Kệ nhỏ gọn cho góc sofa' }
+      ],
+      general: [
+        { url: '/images/anh-thuc-te-ke/ke-bep-misu-1.jpg.png',   caption: 'Mẫu kệ bếp thực tế' },
+        { url: '/images/anh-thuc-te-ke/ke-phong-khach-1.jpg.png', caption: 'Kệ module cho phòng khách' },
+        { url: '/images/anh-thuc-te-ke/ke-goc-lam-viec-1.jpg.png', caption: 'Kệ cho góc làm việc' },
+        { url: '/images/anh-thuc-te-ke/ke-phong-ngu-1.jpg.png',   caption: 'Kệ cho phòng ngủ' }
+      ]
+    };
+
+    function detectImageRequest(text) {
+      var t = text.toLowerCase();
+      var imageWords = ['hình', 'ảnh', 'mẫu thực', 'kệ thực', 'hình thực', 'mẫu kệ', 'xem mẫu',
+                        'gửi ảnh', 'gửi hình', 'xem ảnh', 'thực tế', 'hình sản phẩm', 'xem mẫu thật',
+                        'cho xem', 'hình mẫu'];
+      var hasIntent = imageWords.some(function(w) { return t.includes(w); });
+      if (!hasIntent) return null;
+      if (t.includes('bếp'))                              return 'kitchen';
+      if (t.includes('phòng khách'))                      return 'living';
+      if (t.includes('làm việc') || t.includes('góc làm')) return 'workspace';
+      if (t.includes('phòng ngủ'))                        return 'bedroom';
+      if (t.includes('cafe') || t.includes('cà phê'))     return 'cafe';
+      if (t.includes('đọc sách'))                         return 'reading';
+      if (t.includes('sofa'))                             return 'sofa';
+      return 'general';
+    }
+
+    function appendImageGrid(images) {
+      var wrap = document.createElement('div');
+      wrap.className = 'misu-chat-message misu-bot';
+      wrap.style.background = 'transparent';
+      wrap.style.padding = '0';
+
+      var grid = document.createElement('div');
+      grid.className = 'misu-chat-image-grid';
+
+      images.slice(0, 4).forEach(function(item) {
+        var a = document.createElement('a');
+        a.className = 'misu-chat-image-card';
+        a.href = item.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+
+        var img = document.createElement('img');
+        img.src = item.url;
+        img.alt = item.caption;
+        img.loading = 'lazy';
+
+        var cap = document.createElement('div');
+        cap.className = 'misu-chat-image-caption';
+        cap.textContent = item.caption;
+
+        a.appendChild(img);
+        a.appendChild(cap);
+        grid.appendChild(a);
+      });
+
+      wrap.appendChild(grid);
+      msgArea.appendChild(wrap);
+      scrollDown();
+    }
 
     /* ── Init ───────────────────────────────────────────────────── */
     checkHealth();
