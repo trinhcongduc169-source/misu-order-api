@@ -1689,6 +1689,91 @@
       .misu-chat-image-grid { grid-template-columns: 1fr; }
       .misu-chat-image-card img { height: 160px; }
     }
+
+    /* ── Lightbox ───────────────────────────────────────────────── */
+    .misu-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(0,0,0,.88);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s ease;
+    }
+    .misu-lightbox.misu-lb-open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .misu-lb-img {
+      max-width: calc(100vw - 88px);
+      max-height: calc(100vh - 120px);
+      object-fit: contain;
+      border-radius: 10px;
+      display: block;
+      width: auto;
+      height: auto;
+    }
+    .misu-lb-caption {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,.75);
+      font-size: .78rem;
+      text-align: center;
+      max-width: 80vw;
+      line-height: 1.4;
+      pointer-events: none;
+    }
+    .misu-lb-counter {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,.5);
+      font-size: .73rem;
+      pointer-events: none;
+    }
+    .misu-lb-close {
+      position: absolute;
+      top: 12px; right: 14px;
+      width: 38px; height: 38px; min-height: unset;
+      background: rgba(255,255,255,.13);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      display: grid; place-items: center;
+      font-family: inherit;
+      padding: 0;
+      transition: background .15s;
+    }
+    .misu-lb-close:hover { background: rgba(255,255,255,.24); }
+    .misu-lb-prev,
+    .misu-lb-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px; height: 40px; min-height: unset;
+      background: rgba(255,255,255,.13);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: grid; place-items: center;
+      font-family: inherit;
+      padding: 0;
+      transition: background .15s;
+    }
+    .misu-lb-prev { left: 12px; }
+    .misu-lb-next { right: 12px; }
+    .misu-lb-prev:hover,
+    .misu-lb-next:hover { background: rgba(255,255,255,.24); }
   </style>
 
   <!-- Toggle button -->
@@ -2043,6 +2128,94 @@
       return 'general';
     }
 
+    /* ── Lightbox ───────────────────────────────────────────────── */
+    var lbOverlay, lbImg, lbCaption, lbCounter, lbPrev, lbNext;
+    var lbImages = [];
+    var lbIndex  = 0;
+
+    function createLightbox() {
+      lbOverlay = document.createElement('div');
+      lbOverlay.className = 'misu-lightbox';
+      lbOverlay.setAttribute('role', 'dialog');
+      lbOverlay.setAttribute('aria-modal', 'true');
+
+      var lbClose = document.createElement('button');
+      lbClose.className = 'misu-lb-close';
+      lbClose.innerHTML = '&#x2715;';
+      lbClose.setAttribute('aria-label', 'Đóng');
+      lbClose.addEventListener('click', closeLightbox);
+
+      lbCounter = document.createElement('div');
+      lbCounter.className = 'misu-lb-counter';
+
+      lbPrev = document.createElement('button');
+      lbPrev.className = 'misu-lb-prev';
+      lbPrev.innerHTML = '&#9664;';
+      lbPrev.setAttribute('aria-label', 'Ảnh trước');
+      lbPrev.addEventListener('click', function() { lbNavigate(-1); });
+
+      lbNext = document.createElement('button');
+      lbNext.className = 'misu-lb-next';
+      lbNext.innerHTML = '&#9654;';
+      lbNext.setAttribute('aria-label', 'Ảnh sau');
+      lbNext.addEventListener('click', function() { lbNavigate(1); });
+
+      lbImg = document.createElement('img');
+      lbImg.className = 'misu-lb-img';
+      lbImg.alt = '';
+
+      lbCaption = document.createElement('div');
+      lbCaption.className = 'misu-lb-caption';
+
+      lbOverlay.appendChild(lbClose);
+      lbOverlay.appendChild(lbCounter);
+      lbOverlay.appendChild(lbPrev);
+      lbOverlay.appendChild(lbImg);
+      lbOverlay.appendChild(lbNext);
+      lbOverlay.appendChild(lbCaption);
+
+      lbOverlay.addEventListener('click', function(e) {
+        if (e.target === lbOverlay) closeLightbox();
+      });
+
+      document.body.appendChild(lbOverlay);
+
+      document.addEventListener('keydown', function(e) {
+        if (!lbOverlay.classList.contains('misu-lb-open')) return;
+        if (e.key === 'Escape')     closeLightbox();
+        if (e.key === 'ArrowLeft')  lbNavigate(-1);
+        if (e.key === 'ArrowRight') lbNavigate(1);
+      });
+    }
+
+    function openLightbox(images, startIndex) {
+      lbImages = images;
+      lbIndex  = startIndex || 0;
+      lbRender();
+      lbOverlay.classList.add('misu-lb-open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lbOverlay.classList.remove('misu-lb-open');
+      document.body.style.overflow = '';
+    }
+
+    function lbNavigate(dir) {
+      lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+      lbRender();
+    }
+
+    function lbRender() {
+      var item = lbImages[lbIndex];
+      lbImg.src            = item.url;
+      lbImg.alt            = item.caption;
+      lbCaption.textContent = item.caption;
+      lbCounter.textContent = (lbIndex + 1) + ' / ' + lbImages.length;
+      lbPrev.style.display  = lbImages.length > 1 ? '' : 'none';
+      lbNext.style.display  = lbImages.length > 1 ? '' : 'none';
+    }
+
     function appendImageGrid(images) {
       var wrap = document.createElement('div');
       wrap.className = 'misu-chat-message misu-bot';
@@ -2052,12 +2225,10 @@
       var grid = document.createElement('div');
       grid.className = 'misu-chat-image-grid';
 
-      images.slice(0, 4).forEach(function(item) {
-        var a = document.createElement('a');
-        a.className = 'misu-chat-image-card';
-        a.href = item.url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
+      images.slice(0, 4).forEach(function(item, i) {
+        var card = document.createElement('div');
+        card.className = 'misu-chat-image-card';
+        card.style.cursor = 'pointer';
 
         var img = document.createElement('img');
         img.src = item.url;
@@ -2068,9 +2239,13 @@
         cap.className = 'misu-chat-image-caption';
         cap.textContent = item.caption;
 
-        a.appendChild(img);
-        a.appendChild(cap);
-        grid.appendChild(a);
+        card.appendChild(img);
+        card.appendChild(cap);
+        card.addEventListener('click', (function(idx) {
+          return function() { openLightbox(images, idx); };
+        })(i));
+
+        grid.appendChild(card);
       });
 
       wrap.appendChild(grid);
@@ -2079,6 +2254,7 @@
     }
 
     /* ── Init ───────────────────────────────────────────────────── */
+    createLightbox();
     checkHealth();
     appendMsg('bot', 'Xin chào anh/chị! Em là nhân viên tư vấn của **MISU** 😊\n\nAnh/chị đang cần kệ cho không gian nào – bếp, phòng khách, phòng ngủ hay góc làm việc ạ?');
 
